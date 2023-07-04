@@ -19,8 +19,7 @@ CREATE TABLE "sensors" (
   model VARCHAR(50),
   serial VARCHAR(50),
   firmware VARCHAR(50),
-  power_max INTEGER,
-  CONSTRAINT model FOREIGN KEY (model) REFERENCES code (model)
+  power_max INTEGER
 );
 
 CREATE TABLE "plan" (
@@ -64,6 +63,7 @@ CREATE TABLE "live" (
   CONSTRAINT sensor_id FOREIGN KEY (sensor_id) REFERENCES sensors (id),
   CONSTRAINT plan_id FOREIGN KEY (plan_id) REFERENCES plan (id),
   CONSTRAINT state FOREIGN KEY (state) REFERENCES state (id)
+  ---CONSTRAINT code FOREIGN KEY (code) REFERENCES code (id)
 );
 
 SELECT create_hypertable('live', 'time');
