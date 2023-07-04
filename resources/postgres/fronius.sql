@@ -1,4 +1,4 @@
-\c solarmeter
+\c fronius
 
 DROP MATERIALIZED VIEW IF EXISTS "monthly_view" CASCADE;
 DROP MATERIALIZED VIEW IF EXISTS "daily_view" CASCADE;
@@ -8,17 +8,18 @@ DROP TABLE IF EXISTS "archive" CASCADE;
 DROP TABLE IF EXISTS "live" CASCADE;
 DROP TABLE IF EXISTS "sensors" CASCADE;
 DROP TABLE IF EXISTS "plan" CASCADE;
+DROP TABLE IF EXISTS "state" CASCADE;
+DROP TABLE IF EXISTS "code" CASCADE;
 
 CREATE EXTENSION IF NOT EXISTS timescaledb;
 
 CREATE TABLE "sensors" (
   id SERIAL PRIMARY KEY,
-  serial_num VARCHAR(50),
-  part_num VARCHAR(50),
-  mfg_date VARCHAR(50),
+  mfg VARCHAR(50),
+  model VARCHAR(50),
+  serial VARCHAR(50),
   firmware VARCHAR(50),
-  inverter_type VARCHAR(50),
-  grid_standard VARCHAR(50)
+  power_max INTEGER
 );
 
 CREATE TABLE "plan" (
@@ -26,37 +27,47 @@ CREATE TABLE "plan" (
   payment DOUBLE PRECISION
 );
 
+CREATE TABLE "code" (
+  id INTEGER NOT NULL,
+  model VARCHAR(50),
+  description VARCHAR(255)
+);
+
+CREATE TABLE "state" (
+  id INTEGER NOT NULL,
+  description VARCHAR(255)
+);
+
 CREATE TABLE "live" (
   time TIMESTAMPTZ NOT NULL,
   sensor_id INTEGER NOT NULL,
   plan_id INTEGER NOT NULL,
-  total_energy DOUBLE PRECISION,
-  voltage_p1 DOUBLE PRECISION,
-  current_p1 DOUBLE PRECISION,
-  power_p1 DOUBLE PRECISION,
-  voltage_p2 DOUBLE PRECISION,
-  current_p2 DOUBLE PRECISION,
-  power_p2 DOUBLE PRECISION,
-  grid_voltage DOUBLE PRECISION,
-  grid_current DOUBLE PRECISION,
-  grid_power DOUBLE PRECISION,
-  frequency DOUBLE PRECISION,
-  efficiency DOUBLE PRECISION,
-  inverter_temp DOUBLE PRECISION,
-  booster_temp DOUBLE PRECISION,
-  r_iso DOUBLE PRECISION,
+  state INTEGER,
+  code INTEGER,
+  ac_current DOUBLE PRECISION,
+  ac_voltage DOUBLE PRECISION,
+  ac_power_w DOUBLE PRECISION,
+  ac_power_va DOUBLE PRECISION,
+  ac_power_var DOUBLE PRECISION,
+  ac_pf DOUBLE PRECISION,
+  ac_freq DOUBLE PRECISION,
+  ac_energy DOUBLE PRECISION,
+  dc_voltage_1 DOUBLE PRECISION,
+  dc_current_1 DOUBLE PRECISION,
+  dc_power_1 DOUBLE PRECISION,
+  dc_energy_1 DOUBLE PRECISION,
+  dc_voltage_2 DOUBLE PRECISION,
+  dc_current_2 DOUBLE PRECISION,
+  dc_power_2 DOUBLE PRECISION,
+  dc_energy_2 DOUBLE PRECISION,
   CONSTRAINT sensor_id FOREIGN KEY (sensor_id) REFERENCES sensors (id),
-  CONSTRAINT plan_id FOREIGN KEY (plan_id) REFERENCES plan (id)
+  CONSTRAINT plan_id FOREIGN KEY (plan_id) REFERENCES plan (id),
+  CONSTRAINT state FOREIGN KEY (state) REFERENCES state (id),
+  CONSTRAINT code FOREIGN KEY (code) REFERENCES code (id)
 );
 
 SELECT create_hypertable('live', 'time');
-SELECT add_retention_policy('live', INTERVAL '10 days');
-
-INSERT INTO sensors(id, serial_num, part_num, mfg_date, firmware, inverter_type, grid_standard) VALUES
-(1, '126014', '-3G79-', 'Year 10 Week 20', 'C.0.2.2', 'Aurora 4.2kW new', 'VDE0126');
-
-INSERT INTO plan(id, payment) VALUES
-(1, 0.3914);
+SELECT add_retention_policy('live', INTERVAL '30 days');
 
 GRANT INSERT, SELECT ON TABLE live TO nodejs;
 GRANT SELECT ON TABLE live TO grafana;
