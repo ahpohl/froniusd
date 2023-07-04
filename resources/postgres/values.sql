@@ -1,3 +1,5 @@
+\c fronius
+
 INSERT INTO sensors(id, mfg, model, serial, firmware, power_max) VALUES
 (1, 'ABB Aurora', 'PVI-4.2-TL-OUTD', '126014', 'C.0.2.2', '4200'),
 (2, 'Fronius', 'Primo', '34119102', '0.3.30.0', '4000');
@@ -94,7 +96,7 @@ INSERT INTO code(id, model, description) VALUES
 (734, 'Primo', 'No Software Update Found On USB Flash Drive'),
 (735, 'Primo', 'No Supported Software Update Found On USB Flash Drive'),
 (736, 'Primo', 'USB Flash Drive Flash Drive Read/Write Error'),
-(738, 'Primo', 'Log-File Can\'t Be Created On The USB Flash Drive'),
+(738, 'Primo', E'Log-File Can\'t Be Created On The USB Flash Drive'),
 (743, 'Primo', 'Software Update Failed'),
 (745, 'Primo', 'Software Update Checksum Wrong'),
 (751, 'Primo', 'Real Time Clock - Time Lost'),
@@ -208,7 +210,7 @@ INSERT INTO code(id, model, description) VALUES
 (735, 'Symo', 'No Supported Software Update Found On USB Flash Drive'),
 (736, 'Symo', 'USB Flash Drive Flash Drive Read/Write Error'),
 (737, 'Symo', 'Software Update Can Not Be Read From The USB Flash Drive'),
-(738, 'Symo', 'Log-File Can\'t Be Created On The USB Flash Drive'),
+(738, 'Symo', E'Log-File Can\'t Be Created On The USB Flash Drive'),
 (740, 'Symo', 'USB Flash Drive Enumeration Error'),
 (741, 'Symo', 'USB Flash Drive Logging Write Error'),
 (743, 'Symo', 'Software Update Failed'),
@@ -287,7 +289,7 @@ INSERT INTO code(id, model, description) VALUES
 (734, 'Galvo', 'No Software Update Found On USB Flash Drive'),
 (735, 'Galvo', 'No Supported Software Update Found On USB Flash Drive'),
 (736, 'Galvo', 'USB Flash Drive Flash Drive Read/Write Error'),
-(738, 'Galvo', 'Log-File Can\'t Be Created On The USB Flash Drive'),
+(738, 'Galvo', E'Log-File Can\'t Be Created On The USB Flash Drive'),
 (743, 'Galvo', 'Software Update Failed'),
 (745, 'Galvo', 'Software Update Checksum Wrong'),
 (751, 'Galvo', 'Real Time Clock - Time Lost'),
@@ -369,7 +371,7 @@ INSERT INTO code(id, model, description) VALUES
 (466, 'IGPlus', 'Display not available'),
 (467, 'IGPlus', 'Timeout during start up'),
 (469, 'IGPlus', 'Output inductor connection mixed up'),
-(470, 'IGPlus', 'Buck converter relay doesn't open'),
+(470, 'IGPlus', E'Buck converter relay doesn\'t open'),
 (471, 'IGPlus', 'Module grounding fuse defective'),
 (472, 'IGPlus', 'Grounding Fuse defect'),
 (474, 'IGPlus', '100kOhm module grounding measurement detects failure'),

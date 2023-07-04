@@ -34,7 +34,7 @@ CREATE TABLE "code" (
 );
 
 CREATE TABLE "state" (
-  id INTEGER NOT NULL,
+  id SERIAL PRIMARY KEY,
   description VARCHAR(255)
 );
 
@@ -62,8 +62,8 @@ CREATE TABLE "live" (
   dc_energy_2 DOUBLE PRECISION,
   CONSTRAINT sensor_id FOREIGN KEY (sensor_id) REFERENCES sensors (id),
   CONSTRAINT plan_id FOREIGN KEY (plan_id) REFERENCES plan (id),
-  CONSTRAINT state FOREIGN KEY (state) REFERENCES state (id),
-  CONSTRAINT code FOREIGN KEY (code) REFERENCES code (id)
+  CONSTRAINT state FOREIGN KEY (state) REFERENCES state (id)
+  ---CONSTRAINT code FOREIGN KEY (code) REFERENCES code (id)
 );
 
 SELECT create_hypertable('live', 'time');
