@@ -27,7 +27,7 @@ CPPFLAGS += -DVERSION_BUILD_DATE=\""$(shell date "+%F %T")"\" \
             -DVERSION_BUILD=\"$(BUILD_INFO)\"
 
 # define any directories containing header files other than /usr/include
-INCLUDES = -I./include -I../libsunspec/include
+INCLUDES = -I./include
 
 # define library paths in addition to /usr/lib
 LFLAGS =
@@ -38,9 +38,9 @@ LIBS = -lstdc++fs -lmosquitto -lsunspec
 # define cross compiler for aarch64 target
 ifeq ($(CROSS_COMPILE),aarch64)
 CPP := aarch64-unknown-linux-gnu-g++
-# use local libmodbus compiled for aarch64
-LFLAGS += -L../libsunspec/modbus/lib
-INCLUDES += -I../libsunspec/modbus/include
+# use local libmodbus and libsunspec compiled for aarch64
+LFLAGS += -L../libsunspec/modbus/lib -L../libsunspec/build
+INCLUDES += -I../libsunspec/modbus/include -I../libsunspec/include
 endif
 
 # define src and obj directories
