@@ -18,6 +18,11 @@ export BUILD_INFO := $(COMMIT)$(BUILD_INFO_COMMITS)$(BUILD_INFO_DIRTY)
 # define the C compiler to use
 CPP = g++
 
+# define cross compiler for aarch64 target
+ifeq ($(CROSS_COMPILE),aarch64)
+CPP := aarch64-unknown-linux-gnu-g++
+endif
+
 # define any compile-time flags
 CPPFLAGS = -Wall -g -std=c++17 -pthread
 
@@ -29,19 +34,19 @@ CPPFLAGS += -DVERSION_BUILD_DATE=\""$(shell date "+%F %T")"\" \
 # define any directories containing header files other than /usr/include
 INCLUDES = -I./include
 
+ifeq ($(CROSS_COMPILE),aarch64)
+INCLUDES += -I../libsunspec/include
+endif
+
 # define library paths in addition to /usr/lib
 LFLAGS =
 
-# define any libraries to link into executable:
-LIBS = -lstdc++fs -lmosquitto -lsunspec
-
-# define cross compiler for aarch64 target
 ifeq ($(CROSS_COMPILE),aarch64)
-CPP := aarch64-unknown-linux-gnu-g++
-# use local libmodbus and libsunspec compiled for aarch64
-LFLAGS += -L../libsunspec/modbus/lib -L../libsunspec/build
-INCLUDES += -I../libsunspec/modbus/include -I../libsunspec/include
+LFLAGS += -L../libsunspec/build
 endif
+
+# define any libraries to link into executable:
+LIBS = -Wl,-Bstatic -lsunspec -Wl,-Bdynamic -lmodbus -lmosquitto 
 
 # define src and obj directories
 SRC_DIR = src
