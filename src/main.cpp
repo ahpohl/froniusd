@@ -92,7 +92,7 @@ int main(int argc, char* argv[])
 
   while (shutdown == false)
   {
-    std::this_thread::sleep_for(std::chrono::seconds(1));
+    std::this_thread::sleep_for(std::chrono::seconds(10));
 	  if (!meter->Receive())
 	  {
       if (timeout < 5)

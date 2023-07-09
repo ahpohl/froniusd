@@ -6,21 +6,21 @@
 #include <thread>
 #include <stdexcept>
 #include <vector>
+#include <FroniusInverter.h>
 #include "Solarmeter.h"
 
 const std::set<std::string> Solarmeter::ValidKeys {"log_level", "mqtt_broker", "mqtt_password", "mqtt_port", "mqtt_topic", "mqtt_user", "mqtt_tls_cafile", "mqtt_tls_capath", "payment_kwh", "serial_device"};
 
-Solarmeter::Solarmeter(void)
+Solarmeter::Solarmeter(void) : Log(0)
 {
-  Inverter = new ABBAurora();;
+  Inverter = new FroniusInverter();
   Mqtt = new SolarmeterMqtt();
   Cfg = new SolarmeterConfig();
 }
 
 Solarmeter::~Solarmeter(void)
 {
-  if (Mqtt->GetConnectStatus())
-  {
+  if (Mqtt->GetConnectStatus()) {
     Mqtt->PublishMessage("offline", Cfg->GetValue("mqtt_topic") + "/status", 1, true);
     std::this_thread::sleep_for(std::chrono::milliseconds(1));
   }
@@ -31,83 +31,67 @@ Solarmeter::~Solarmeter(void)
 
 bool Solarmeter::Setup(const std::string &config)
 {
-  if (!Cfg->Begin(config))
-  {
+  if (!Cfg->Begin(config)) {
     ErrorMessage = Cfg->GetErrorMessage();
     return false;
   }
-  if (!Cfg->ValidateKeys(Solarmeter::ValidKeys))
-  {
+  if (!Cfg->ValidateKeys(Solarmeter::ValidKeys)) {
     ErrorMessage = Cfg->GetErrorMessage();
     return false;
   }
   this->SetLogLevel();
-  Inverter->SetLogLevel(Log);
+  //Inverter->SetLogLevel(Log);
   Mqtt->SetLogLevel(Log);
-  if (Log & static_cast<unsigned char>(LogLevelEnum::CONFIG))
-  {
+  if (Log & static_cast<unsigned char>(LogLevel::CONFIG)) {
     Cfg->ShowConfig();
   }
-  if (!(Cfg->KeyExists("payment_kwh")))
-  {
+  if (!(Cfg->KeyExists("payment_kwh"))) {
     ErrorMessage = Cfg->GetErrorMessage();
     return false;
   }
-  if (!(Cfg->KeyExists("serial_device")))
-  {
+  if (!(Cfg->KeyExists("serial_device"))) {
     ErrorMessage = Cfg->GetErrorMessage();
     return false;
   }
-  if (!Inverter->Setup(Cfg->GetValue("serial_device")))
-  {
+  if (!Inverter->ConnectModbusRtu(Cfg->GetValue("serial_device"))) {
     ErrorMessage = Inverter->GetErrorMessage();
     return false;
   }
-  if (!Inverter->ReadCumulatedEnergy(Datagram.TotalEnergy, CumulatedEnergyEnum::LIFETIME_TOTAL))
-  {
+  if (!Inverter->GetSiteEnergyTotal(Datagram.TotalEnergy)) {
     ErrorMessage = Inverter->GetErrorMessage();
     return false;
   }
   std::cout << "Current meter reading: " << Datagram.TotalEnergy << " kWh" << std::endl;
   
-  if (!Mqtt->Begin())
-  {
+  if (!Mqtt->Begin()) {
     ErrorMessage = Mqtt->GetErrorMessage();
     return false;
   }
-  if (!(Cfg->KeyExists("mqtt_topic")))
-  {
+  if (!(Cfg->KeyExists("mqtt_topic"))) {
     ErrorMessage = Cfg->GetErrorMessage();
     return false;
   }
-  if ((Cfg->KeyExists("mqtt_user") && Cfg->KeyExists("mqtt_password")))
-  {
-    if (!Mqtt->SetUserPassAuth(Cfg->GetValue("mqtt_user"), Cfg->GetValue("mqtt_password")))
-    {
+  if ((Cfg->KeyExists("mqtt_user") && Cfg->KeyExists("mqtt_password"))) {
+    if (!Mqtt->SetUserPassAuth(Cfg->GetValue("mqtt_user"), Cfg->GetValue("mqtt_password"))) {
       ErrorMessage = Mqtt->GetErrorMessage();
       return false;
     }
   }
-  if (Cfg->KeyExists("mqtt_tls_cafile") || Cfg->KeyExists("mqtt_tls_capath"))
-  {
-    if (!Mqtt->SetTlsConnection(Cfg->GetValue("mqtt_tls_cafile"), Cfg->GetValue("mqtt_tls_capath")))
-    {
+  if (Cfg->KeyExists("mqtt_tls_cafile") || Cfg->KeyExists("mqtt_tls_capath")) {
+    if (!Mqtt->SetTlsConnection(Cfg->GetValue("mqtt_tls_cafile"), Cfg->GetValue("mqtt_tls_capath"))) {
       ErrorMessage = Mqtt->GetErrorMessage();
       return false;
     }
   }
-  if (!(Cfg->KeyExists("mqtt_broker")) || !(Cfg->KeyExists("mqtt_port")) )
-  {
+  if (!(Cfg->KeyExists("mqtt_broker")) || !(Cfg->KeyExists("mqtt_port")) ) {
     ErrorMessage = Cfg->GetErrorMessage();
     return false;
   }
-  if (!Mqtt->SetLastWillTestament("offline", Cfg->GetValue("mqtt_topic") + "/status", 1, true))
-  {
+  if (!Mqtt->SetLastWillTestament("offline", Cfg->GetValue("mqtt_topic") + "/status", 1, true)) {
     ErrorMessage = Mqtt->GetErrorMessage();
     return false;
   }
-  if (!Mqtt->Connect(Cfg->GetValue("mqtt_broker"), StringTo<double>(Cfg->GetValue("mqtt_port")), 60))
-  {
+  if (!Mqtt->Connect(Cfg->GetValue("mqtt_broker"), StringTo<double>(Cfg->GetValue("mqtt_port")), 60)) {
     ErrorMessage = Mqtt->GetErrorMessage();
     return false;
   }
@@ -118,8 +102,8 @@ bool Solarmeter::Setup(const std::string &config)
 
 bool Solarmeter::Receive(void)
 {
-  if (!Inverter->ReadState(State))
-  {
+  /*
+  if (!Inverter->ReadState(State)) {
     ErrorMessage = Inverter->GetErrorMessage();
     return false;
   }
@@ -157,74 +141,50 @@ bool Solarmeter::Receive(void)
   }
   Datagram.InverterType = version.Par1;
   Datagram.GridStandard = version.Par2;
+  */
 
-  if (!Inverter->ReadCumulatedEnergy(Datagram.TotalEnergy, CumulatedEnergyEnum::LIFETIME_TOTAL))
-  {
+  if (!Inverter->GetSiteEnergyTotal(Datagram.TotalEnergy)) {
     ErrorMessage = Inverter->GetErrorMessage();
     return false;
   }
-  if (!Inverter->ReadDspValue(Datagram.VoltageP1, DspValueEnum::V_IN_1))
-  {
+
+  if (!Inverter->GetDcVoltage(Datagram.VoltageP1, 1)) {
     ErrorMessage = Inverter->GetErrorMessage();
     return false;
   }
-  if (!Inverter->ReadDspValue(Datagram.CurrentP1, DspValueEnum::I_IN_1))
-  {
+  if (!Inverter->GetDcCurrent(Datagram.CurrentP1, 1)) {
     ErrorMessage = Inverter->GetErrorMessage();
     return false;
   }
-  if (!Inverter->ReadDspValue(Datagram.PowerP1, DspValueEnum::POWER_IN_1))
-  {
+  if (!Inverter->GetDcPower(Datagram.PowerP1, 1)) {
     ErrorMessage = Inverter->GetErrorMessage();
     return false;
   }
-  if (!Inverter->ReadDspValue(Datagram.VoltageP2, DspValueEnum::V_IN_2))
-  {
+  if (!Inverter->GetDcVoltage(Datagram.VoltageP2, 2)) {
     ErrorMessage = Inverter->GetErrorMessage();
     return false;
   }
-  if (!Inverter->ReadDspValue(Datagram.CurrentP2, DspValueEnum::I_IN_2))
-  {
+  if (!Inverter->GetDcCurrent(Datagram.CurrentP2, 2)) {
     ErrorMessage = Inverter->GetErrorMessage();
     return false;
   }
-  if (!Inverter->ReadDspValue(Datagram.PowerP2, DspValueEnum::POWER_IN_2))
-  {
+  if (!Inverter->GetDcPower(Datagram.PowerP2, 2)) {
     ErrorMessage = Inverter->GetErrorMessage();
     return false;
   }
-  if (!Inverter->ReadDspValue(Datagram.GridVoltage, DspValueEnum::GRID_VOLTAGE))
-  {
+  if (!Inverter->GetAcVoltage(Datagram.GridVoltage)) {
     ErrorMessage = Inverter->GetErrorMessage();
     return false;
   }
-  if (!Inverter->ReadDspValue(Datagram.GridCurrent, DspValueEnum::GRID_CURRENT))
-  {
+  if (!Inverter->GetAcCurrent(Datagram.GridCurrent)) {
     ErrorMessage = Inverter->GetErrorMessage();
     return false;
   }
-  if (!Inverter->ReadDspValue(Datagram.GridPower, DspValueEnum::GRID_POWER))
-  {
+  if (!Inverter->GetAcPower(Datagram.GridPower)) {
     ErrorMessage = Inverter->GetErrorMessage();
     return false;
   }
-  if (!Inverter->ReadDspValue(Datagram.Frequency, DspValueEnum::FREQUENCY))
-  {
-    ErrorMessage = Inverter->GetErrorMessage();
-    return false;
-  }
-  if (!Inverter->ReadDspValue(Datagram.InverterTemp, DspValueEnum::TEMPERATURE_INVERTER))
-  {
-    ErrorMessage = Inverter->GetErrorMessage();
-    return false;
-  }
-  if (!Inverter->ReadDspValue(Datagram.BoosterTemp, DspValueEnum::TEMPERATURE_BOOSTER))
-  {
-    ErrorMessage = Inverter->GetErrorMessage();
-    return false;
-  }
-  if (!Inverter->ReadDspValue(Datagram.RIso, DspValueEnum::ISOLATION_RESISTANCE))
-  {
+  if (!Inverter->GetAcFrequency(Datagram.Frequency)) {
     ErrorMessage = Inverter->GetErrorMessage();
     return false;
   }
@@ -253,7 +213,7 @@ bool Solarmeter::Publish(void)
   Payload.str(std::string());
   Payload.setf(std::ios::fixed, std::ios::floatfield);
 
-  Payload << "[{"
+  Payload << "{"
     << "\"time\":" << now << ","
     << "\"total_energy\":" << std::setprecision(2) << Datagram.TotalEnergy << "," 
     << "\"voltage_p1\":" << std::setprecision(2) << Datagram.VoltageP1 << ","
@@ -267,19 +227,10 @@ bool Solarmeter::Publish(void)
     << "\"grid_power\":" << std::setprecision(2) << Datagram.GridPower << ","
     << "\"frequency\":" << std::setprecision(3) << Datagram.Frequency << ","
     << "\"efficiency\":" << std::setprecision(2) << Datagram.Efficiency << ","
-    << "\"inverter_temp\":" << std::setprecision(2) << Datagram.InverterTemp << ","
-    << "\"booster_temp\":" << std::setprecision(2) << Datagram.BoosterTemp << ","
-    << "\"r_iso\":" << std::setprecision(3) << Datagram.RIso << ","
     << "\"payment\":" << Cfg->GetValue("payment_kwh")
-    << "},{"
-    << "\"serial_num\":\"" << Datagram.SerialNum << "\","
-    << "\"part_num\":\"" << Datagram.PartNum << "\","
-    << "\"mfg_date\":\"" << Datagram.MfgDate << "\","
-    << "\"firmware\":\"" << Datagram.Firmware << "\","
-    << "\"inverter_type\":\"" << Datagram.InverterType << "\"," 
-    << "\"grid_standard\":\"" << Datagram.GridStandard << "\""
-    << "}]";
+    << "}";
 
+  /*
   std::ostringstream oss;
   oss << "[{"
     << "\"global_state\":\"" << State.GlobalState << "\"" << ","
@@ -287,6 +238,7 @@ bool Solarmeter::Publish(void)
     << "\"ch1_state\":\"" << State.Channel1State << "\"" << ","
     << "\"ch2_state\":\"" << State.Channel2State << "\"" << ","
     << "\"alarm_state\":\"" << State.AlarmState << "\"" << "}]";
+  */
 
   if (Mqtt->GetNotifyOnlineFlag())
   {
@@ -298,6 +250,7 @@ bool Solarmeter::Publish(void)
     }
   }
 
+  /*
   static ABBAurora::State previous_state;
   if ( Mqtt->GetNotifyOnlineFlag() || 
        (!((previous_state.GlobalState == State.GlobalState) &&
@@ -313,6 +266,7 @@ bool Solarmeter::Publish(void)
     }
     previous_state = State;
   }
+  */
   if (Mqtt->GetConnectStatus())
   {
     if (!(Mqtt->PublishMessage(Payload.str(), Cfg->GetValue("mqtt_topic") + "/live", 0, false)))
@@ -323,10 +277,10 @@ bool Solarmeter::Publish(void)
   }
   Mqtt->SetNotifyOnlineFlag(false);
 
-  if (Log & static_cast<unsigned char>(LogLevelEnum::JSON))
+  if (Log & static_cast<unsigned char>(LogLevel::JSON))
   {
     std::cout << Payload.str() << std::endl;
-    std::cout << oss.str() << std::endl;
+    //std::cout << oss.str() << std::endl;
   }
   Payload.flags(old_settings);
   
@@ -355,19 +309,19 @@ void Solarmeter::SetLogLevel(void)
     {
       if (!(*it).compare("config"))
       {
-        Log |= static_cast<unsigned char>(LogLevelEnum::CONFIG);
+        Log |= static_cast<unsigned char>(LogLevel::CONFIG);
       }
       else if (!(*it).compare("json"))
       {
-        Log |= static_cast<unsigned char>(LogLevelEnum::JSON);
+        Log |= static_cast<unsigned char>(LogLevel::JSON);
       }
       else if (!(*it).compare("mosquitto"))
       {
-        Log |= static_cast<unsigned char>(LogLevelEnum::MQTT);
+        Log |= static_cast<unsigned char>(LogLevel::MQTT);
       }
-      else if (!(*it).compare("serial"))
+      else if (!(*it).compare("modbus"))
       {
-        Log |= static_cast<unsigned char>(LogLevelEnum::SERIAL);
+        Log |= static_cast<unsigned char>(LogLevel::MODBUS);
       }
     }
   }

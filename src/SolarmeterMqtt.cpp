@@ -1,10 +1,10 @@
 #include <iostream>
 #include <thread>
 #include <chrono>
+#include <mosquitto.h>
 #include "SolarmeterMqtt.h"
-#include "ABBAuroraEnums.h"
 
-SolarmeterMqtt::SolarmeterMqtt(void): Log(0) 
+SolarmeterMqtt::SolarmeterMqtt(void): Mosq(nullptr), Log(0)
 {
   IsConnected = false;
   NotifyOnlineFlag = false;
@@ -155,7 +155,7 @@ void SolarmeterMqtt::OnConnectCallbackWrapper(struct mosquitto *mosq, void *obj,
 
 void SolarmeterMqtt::LogCallback(struct mosquitto *mosq, void *obj, int level, const char *str)
 {
-  if (Log & static_cast<unsigned char>(LogLevelEnum::MQTT))
+  if (Log & static_cast<unsigned char>(LogLevel::MQTT))
   {
     std::cout << str << std::endl;
   }

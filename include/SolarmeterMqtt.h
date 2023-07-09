@@ -30,6 +30,14 @@ public:
   bool GetConnectStatus(void) const;
   bool GetNotifyOnlineFlag(void) const;
   void SetNotifyOnlineFlag(const bool &flag);
+
+  enum class LogLevel : unsigned char
+  {
+    CONFIG = 0x01,
+    JSON = 0x02,
+    MQTT = 0x04,
+    MODBUS = 0x08
+  };
 };
 
 #endif
