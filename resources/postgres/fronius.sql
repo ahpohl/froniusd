@@ -59,7 +59,7 @@ CREATE TABLE "live" (
   dc_power_2 DOUBLE PRECISION,
   dc_energy_2 DOUBLE PRECISION,
   CONSTRAINT sensor_id FOREIGN KEY (sensor_id) REFERENCES sensors (id),
-  CONSTRAINT plan_id FOREIGN KEY (plan_id) REFERENCES plan (id),
+  CONSTRAINT plan_id FOREIGN KEY (plan_id) REFERENCES plan (id)
 );
 
 SELECT create_hypertable('live', 'time');
