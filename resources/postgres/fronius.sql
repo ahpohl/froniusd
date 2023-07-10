@@ -42,8 +42,7 @@ CREATE TABLE "live" (
   time TIMESTAMPTZ NOT NULL,
   sensor_id INTEGER NOT NULL,
   plan_id INTEGER NOT NULL,
-  state INTEGER,
-  code INTEGER,
+  ac_energy DOUBLE PRECISION,
   ac_current DOUBLE PRECISION,
   ac_voltage DOUBLE PRECISION,
   ac_power_w DOUBLE PRECISION,
@@ -51,7 +50,6 @@ CREATE TABLE "live" (
   ac_power_var DOUBLE PRECISION,
   ac_pf DOUBLE PRECISION,
   ac_freq DOUBLE PRECISION,
-  ac_energy DOUBLE PRECISION,
   dc_voltage_1 DOUBLE PRECISION,
   dc_current_1 DOUBLE PRECISION,
   dc_power_1 DOUBLE PRECISION,
@@ -62,8 +60,6 @@ CREATE TABLE "live" (
   dc_energy_2 DOUBLE PRECISION,
   CONSTRAINT sensor_id FOREIGN KEY (sensor_id) REFERENCES sensors (id),
   CONSTRAINT plan_id FOREIGN KEY (plan_id) REFERENCES plan (id),
-  CONSTRAINT state FOREIGN KEY (state) REFERENCES state (id)
-  ---CONSTRAINT code FOREIGN KEY (code) REFERENCES code (id)
 );
 
 SELECT create_hypertable('live', 'time');
