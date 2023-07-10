@@ -106,6 +106,23 @@ bool Solarmeter::Setup(const std::string &config)
 
 bool Solarmeter::Receive(void)
 {
+	FroniusInverter::StateEvt_t state_evt;
+	if (!Inverter->GetStateEvtFlags(state_evt)) {
+		ErrorMessage = Inverter->GetErrorMessage();
+	    return false;
+	}
+	FroniusInverter::StateCode_t state_code;
+	if (!Inverter->GetStateCode(state_code)) {
+	    ErrorMessage = Inverter->GetErrorMessage();
+	    return false;
+	}
+	if (state_evt.St != 4) {
+		ErrorMessage = state_evt.StStr + " (" + std::to_string(state_evt.St) + ")";
+		if (!(state_code.StStr.empty())) {
+		    ErrorMessage.append(" -> " + state_code.StStr + " (" + std::to_string(state_code.St) + ")");
+		}
+		return false;
+	}
 	if (!Inverter->GetAcEnergyLifetime(InvData.AcEnergy)) {
 		ErrorMessage = Inverter->GetErrorMessage();
 		return false;
