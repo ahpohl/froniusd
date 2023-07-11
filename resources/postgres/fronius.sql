@@ -50,6 +50,7 @@ CREATE TABLE "live" (
   ac_power_var DOUBLE PRECISION,
   ac_pf DOUBLE PRECISION,
   ac_freq DOUBLE PRECISION,
+  ac_eff DOUBLE PRECISION,
   dc_voltage_1 DOUBLE PRECISION,
   dc_current_1 DOUBLE PRECISION,
   dc_power_1 DOUBLE PRECISION,
