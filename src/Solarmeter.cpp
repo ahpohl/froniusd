@@ -37,14 +37,11 @@ bool Solarmeter::Setup(const std::string &config)
 		ErrorMessage = Cfg->GetErrorMessage();
 		return false;
 	}
-	if (!Cfg->ValidateKeys(Solarmeter::ValidKeys)) {
+	if (!(Cfg->ValidateKeys(Solarmeter::ValidKeys))) {
 		ErrorMessage = Cfg->GetErrorMessage();
 		return false;
 	}
 	this->SetLogLevel();
-	if (Log & static_cast<unsigned char>(LogLevel::MODBUS)) {
-		Inverter->SetModbusDebug(true);
-	}
 	Mqtt->SetLogLevel(Log);
 	if (Log & static_cast<unsigned char>(LogLevel::CONFIG)) {
 		Cfg->ShowConfig();
@@ -57,9 +54,18 @@ bool Solarmeter::Setup(const std::string &config)
 		ErrorMessage = Cfg->GetErrorMessage();
 		return false;
 	}
+	/*
 	if (!Inverter->ConnectModbusRtu(Cfg->GetValue("serial_device"))) {
 		ErrorMessage = Inverter->GetErrorMessage();
 		return false;
+	}
+	*/
+	if (!Inverter->ConnectModbusTcp("192.168.178.62")) {
+		ErrorMessage = Inverter->GetErrorMessage();
+		return false;
+	}
+	if (Log & static_cast<unsigned char>(LogLevel::MODBUS)) {
+		Inverter->SetModbusDebug(false);
 	}
 	if (!Inverter->GetSiteEnergyTotal(InvData.AcEnergy)) {
 		ErrorMessage = Inverter->GetErrorMessage();

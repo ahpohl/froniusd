@@ -95,7 +95,7 @@ int main(int argc, char* argv[])
 				std::cout << meter->GetErrorMessage() << std::endl;
 				++timeout;
 			}
-			std::this_thread::sleep_for(std::chrono::seconds(60));
+			std::this_thread::sleep_for(std::chrono::seconds(5));
 			continue;
 		} else {
 			timeout = 0;
