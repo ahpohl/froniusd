@@ -6,6 +6,7 @@
 #include <thread>
 #include <stdexcept>
 #include <vector>
+#include <set>
 #include <FroniusInverter.h>
 #include "Solarmeter.h"
 
@@ -54,19 +55,18 @@ bool Solarmeter::Setup(const std::string &config)
 		ErrorMessage = Cfg->GetErrorMessage();
 		return false;
 	}
-	/*
 	if (!Inverter->ConnectModbusRtu(Cfg->GetValue("serial_device"))) {
-		ErrorMessage = Inverter->GetErrorMessage();
-		return false;
-	}
-	*/
-	if (!Inverter->ConnectModbusTcp("192.168.178.62")) {
 		ErrorMessage = Inverter->GetErrorMessage();
 		return false;
 	}
 	if (Log & static_cast<unsigned char>(LogLevel::MODBUS)) {
 		Inverter->SetModbusDebug(false);
 	}
+	if (!Inverter->IsSunSpecInverter()) {
+		ErrorMessage = Inverter->GetErrorMessage();
+		return false;
+	}
+	std::cout << "SunSpec protocol v1.0" << std::endl;
 	if (!Inverter->GetSiteEnergyTotal(InvData.AcEnergy)) {
 		ErrorMessage = Inverter->GetErrorMessage();
 		return false;
@@ -198,7 +198,7 @@ bool Solarmeter::Receive(void)
 		if (denominator == 0) {
 			throw std::runtime_error("Math error: Attempted to divide by Zero");
 		}
-		InvData.Efficiency = InvData.AcPowerW / denominator * 100.0f;
+		InvData.AcEff = InvData.AcPowerW / denominator * 100.0f;
 	}
 	catch (std::runtime_error& e) {
 		ErrorMessage = e.what();
@@ -215,7 +215,7 @@ bool Solarmeter::Publish(void)
 	std::ios::fmtflags old_settings = Payload.flags();
 	Payload.str(std::string());
 	Payload.setf(std::ios::fixed, std::ios::floatfield);
-	Payload << std::setprecision(2);
+	Payload << std::setprecision(3);
 
 	Payload << "{"
 			<< "\"time\":"         << now                << ","
@@ -227,6 +227,7 @@ bool Solarmeter::Publish(void)
 			<< "\"ac_power_var\":" << InvData.AcPowerVar << ","
 			<< "\"ac_pf\":"        << InvData.AcPf       << ","
 			<< "\"ac_freq\":"      << InvData.AcFreq     << ","
+			<< "\"ac_eff\":"       << InvData.AcEff      << ","
 			<< "\"dc_voltage_1\":" << InvData.DcVoltage1 << ","
 			<< "\"dc_current_1\":" << InvData.DcCurrent1 << ","
 			<< "\"dc_power_1\":"   << InvData.DcPower1   << ","
@@ -235,19 +236,18 @@ bool Solarmeter::Publish(void)
 			<< "\"dc_current_2\":" << InvData.DcCurrent2 << ","
 			<< "\"dc_power_2\":"   << InvData.DcPower2   << ","
 			<< "\"dc_energy_2\":"  << InvData.DcEnergy2  << ","
-			<< "\"efficiency\":"   << InvData.Efficiency << ","
 			<< "\"payment\":"      << Cfg->GetValue("payment_kwh")
 			<< "}";
 
 	/*
-  std::ostringstream oss;
-  oss << "[{"
-    << "\"global_state\":\"" << State.GlobalState << "\"" << ","
-    << "\"inverter_state\":\"" << State.InverterState << "\"" << ","
-    << "\"ch1_state\":\"" << State.Channel1State << "\"" << ","
-    << "\"ch2_state\":\"" << State.Channel2State << "\"" << ","
-    << "\"alarm_state\":\"" << State.AlarmState << "\"" << "}]";
-	 */
+    std::ostringstream oss;
+    oss << "[{"
+        << "\"global_state\":\"" << State.GlobalState << "\"" << ","
+        << "\"inverter_state\":\"" << State.InverterState << "\"" << ","
+        << "\"ch1_state\":\"" << State.Channel1State << "\"" << ","
+        << "\"ch2_state\":\"" << State.Channel2State << "\"" << ","
+        << "\"alarm_state\":\"" << State.AlarmState << "\"" << "}]";
+	*/
 
 	if (Mqtt->GetNotifyOnlineFlag()) {
 		std::cout << "Solarmeter is online." << std::endl;
@@ -258,22 +258,21 @@ bool Solarmeter::Publish(void)
 	}
 
 	/*
-  static ABBAurora::State previous_state;
-  if ( Mqtt->GetNotifyOnlineFlag() || 
-       (!((previous_state.GlobalState == State.GlobalState) &&
-       (previous_state.InverterState == State.InverterState) &&
-       (previous_state.Channel1State == State.Channel1State) &&
-       (previous_state.Channel2State == State.Channel2State) &&
-       (previous_state.AlarmState == State.AlarmState))) )
-  {
-    if (!(Mqtt->PublishMessage(oss.str(), Cfg->GetValue("mqtt_topic") + "/state", 0, false)))
+    static ABBAurora::State previous_state;
+    if ( Mqtt->GetNotifyOnlineFlag() ||
+         (!((previous_state.GlobalState == State.GlobalState) &&
+         (previous_state.InverterState == State.InverterState) &&
+         (previous_state.Channel1State == State.Channel1State) &&
+         (previous_state.Channel2State == State.Channel2State) &&
+         (previous_state.AlarmState == State.AlarmState))) )
     {
-      ErrorMessage = Mqtt->GetErrorMessage();
-      return false;
+    if (!(Mqtt->PublishMessage(oss.str(), Cfg->GetValue("mqtt_topic") + "/state", 0, false))) {
+        ErrorMessage = Mqtt->GetErrorMessage();
+        return false;
     }
     previous_state = State;
-  }
-	 */
+	*/
+
 	if (Mqtt->GetConnectStatus())
 	{
 		if (!(Mqtt->PublishMessage(Payload.str(), Cfg->GetValue("mqtt_topic") + "/live", 0, false)))

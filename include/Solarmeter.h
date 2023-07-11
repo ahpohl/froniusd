@@ -41,6 +41,7 @@ private:
 		double AcPowerVar;          // AC reactive power [VAr]
 		double AcPf;                // AC power factor
 		double AcFreq;              // AC frequency [Hz]
+		double AcEff;               // AC conversion efficiency [%]
 		double DcVoltage1;          // DC voltage string 1 [V]
 		double DcCurrent1;          // DC current string 1 [A]
 		double DcPower1;            // DC power string 1 [W]
@@ -49,7 +50,6 @@ private:
 		double DcCurrent2;          // DC current string 2 [A]
 		double DcPower2;            // DC power string 2 [W]
 		double DcEnergy2;           // DC energy string 2 [kWh]
-		double Efficiency;          // AC/DC conversion efficiency [%]
 		double PaymentKwh;          // Payment per kWh
 	} InvData;
 
