@@ -4,7 +4,7 @@
 #include <mosquitto.h>
 #include "SolarmeterMqtt.h"
 
-SolarmeterMqtt::SolarmeterMqtt(void): Mosq(nullptr), Log(0)
+SolarmeterMqtt::SolarmeterMqtt(void): Mosq(nullptr), Log(false)
 {
 	IsConnected = false;
 	NotifyOnlineFlag = false;
@@ -20,9 +20,9 @@ SolarmeterMqtt::~SolarmeterMqtt(void)
 	mosquitto_lib_cleanup();
 }
 
-void SolarmeterMqtt::SetLogLevel(const unsigned char &log_level)
+void SolarmeterMqtt::SetDebug(const bool &debug)
 {
-	Log = log_level;
+	Log = debug;
 }
 
 bool SolarmeterMqtt::Begin(void)
@@ -140,7 +140,7 @@ void SolarmeterMqtt::OnConnectCallbackWrapper(struct mosquitto *mosq, void *obj,
 
 void SolarmeterMqtt::LogCallback(struct mosquitto *mosq, void *obj, int level, const char *str)
 {
-	if (Log & static_cast<unsigned char>(LogLevel::MQTT)) {
+	if (Log) {
 		std::cout << str << std::endl;
 	}
 }

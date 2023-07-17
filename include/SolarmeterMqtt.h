@@ -11,7 +11,7 @@ class SolarmeterMqtt
 public:
 	SolarmeterMqtt(void);
 	~SolarmeterMqtt(void);
-	void SetLogLevel(const unsigned char &log_level);
+	void SetDebug(const bool &debug);
 	bool Begin(void);
 	bool Connect(const std::string &host, const int &port, const int &keepalive);
 	bool SetUserPassAuth(const std::string &user, const std::string &pass);
@@ -23,14 +23,6 @@ public:
 	bool GetNotifyOnlineFlag(void) const;
 	void SetNotifyOnlineFlag(const bool &flag);
 
-	enum class LogLevel : unsigned char
-	{
-		CONFIG = 0x01,
-		JSON = 0x02,
-		MQTT = 0x04,
-		MODBUS = 0x08
-	};
-
 private:
 	struct mosquitto *Mosq;
 	void OnConnectCallback(struct mosquitto *mosq, void *obj, int connack_code);
@@ -38,7 +30,7 @@ private:
 	std::string ErrorMessage;
 	volatile bool IsConnected;
 	volatile bool NotifyOnlineFlag;
-	unsigned char Log;
+	bool Log;
 };
 
 #endif

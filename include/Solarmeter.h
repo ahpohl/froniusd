@@ -20,9 +20,10 @@ public:
 
 private:
 	FroniusInverter *Inverter;
+	FroniusInverter::StateEvt_t StateEvt;
+	FroniusInverter::StateCode_t StateCode;
 	SolarmeterMqtt *Mqtt;
 	SolarmeterConfig *Cfg;
-	//ABBAurora::State State;
 	std::stringstream Payload;
 	std::string Config;
 	std::string ErrorMessage;
@@ -55,9 +56,9 @@ private:
 
 	enum class LogLevel : unsigned char {
 		CONFIG = 0x01,
-				JSON = 0x02,
-				MQTT = 0x04,
-				MODBUS = 0x08
+		JSON = 0x02,
+		MQTT = 0x04,
+		MODBUS = 0x08
 	};
 };
 

@@ -43,7 +43,9 @@ bool Solarmeter::Setup(const std::string &config)
 		return false;
 	}
 	this->SetLogLevel();
-	Mqtt->SetLogLevel(Log);
+	if (Log & static_cast<unsigned char>(LogLevel::MQTT)) {
+		Mqtt->SetDebug(true);
+	}
 	if (Log & static_cast<unsigned char>(LogLevel::CONFIG)) {
 		Cfg->ShowConfig();
 	}
@@ -145,7 +147,6 @@ bool Solarmeter::Receive(void)
 		ErrorMessage = Inverter->GetErrorMessage();
 		return false;
 	}
-	/*
 	if (!Inverter->GetAcCurrent(InvData.AcCurrent)) {
 		ErrorMessage = Inverter->GetErrorMessage();
 		return false;
@@ -154,7 +155,6 @@ bool Solarmeter::Receive(void)
 		ErrorMessage = Inverter->GetErrorMessage();
 		return false;
 	}
-	*/
 	if (!Inverter->GetAcPower(InvData.AcPowerW)) {
 		ErrorMessage = Inverter->GetErrorMessage();
 		return false;
@@ -171,52 +171,42 @@ bool Solarmeter::Receive(void)
 		ErrorMessage = Inverter->GetErrorMessage();
 		return false;
 	}
-	/*
 	if (!Inverter->GetAcFrequency(InvData.AcFreq)) {
 		ErrorMessage = Inverter->GetErrorMessage();
 		return false;
 	}
-	*/
 	if (!Inverter->GetDcVoltage(InvData.DcVoltage1, 1)) {
 		ErrorMessage = Inverter->GetErrorMessage();
 		return false;
 	}
-	/*
 	if (!Inverter->GetDcCurrent(InvData.DcCurrent1, 1)) {
 		ErrorMessage = Inverter->GetErrorMessage();
 		return false;
 	}
-	*/
 	if (!Inverter->GetDcPower(InvData.DcPower1, 1)) {
 		ErrorMessage = Inverter->GetErrorMessage();
 		return false;
 	}
-	/*
 	if (!Inverter->GetDcEnergyLifetime(InvData.DcEnergy1, 1)) {
 		ErrorMessage = Inverter->GetErrorMessage();
 		return false;
 	}
-	*/
 	if (!Inverter->GetDcVoltage(InvData.DcVoltage2, 2)) {
 		ErrorMessage = Inverter->GetErrorMessage();
 		return false;
 	}
-	/*
 	if (!Inverter->GetDcCurrent(InvData.DcCurrent2, 2)) {
 		ErrorMessage = Inverter->GetErrorMessage();
 		return false;
 	}
-	*/
 	if (!Inverter->GetDcPower(InvData.DcPower2, 2)) {
 		ErrorMessage = Inverter->GetErrorMessage();
 		return false;
 	}
-	/*
 	if (!Inverter->GetDcEnergyLifetime(InvData.DcEnergy2, 2)) {
 		ErrorMessage = Inverter->GetErrorMessage();
 		return false;
 	}
-	*/
 	try {
 		float denominator = InvData.DcPower1 + InvData.DcPower2;
 		if (denominator == 0) {
@@ -263,15 +253,14 @@ bool Solarmeter::Publish(void)
 			<< "\"payment\":"      << Cfg->GetValue("payment_kwh")
 			<< "}";
 
-	/*
-    std::ostringstream oss;
-    oss << "[{"
-        << "\"global_state\":\"" << State.GlobalState << "\"" << ","
+
+	std::ostringstream oss;
+    oss << "{"
+        << "\"operating_state\":\"" << State.GlobalState << "\"" << ","
         << "\"inverter_state\":\"" << State.InverterState << "\"" << ","
         << "\"ch1_state\":\"" << State.Channel1State << "\"" << ","
         << "\"ch2_state\":\"" << State.Channel2State << "\"" << ","
-        << "\"alarm_state\":\"" << State.AlarmState << "\"" << "}]";
-	*/
+        << "\"alarm_state\":\"" << State.AlarmState << "\"" << "}";
 
 	if (Mqtt->GetNotifyOnlineFlag()) {
 		std::cout << "Solarmeter is online." << std::endl;
@@ -309,7 +298,6 @@ bool Solarmeter::Publish(void)
 
 	if (Log & static_cast<unsigned char>(LogLevel::JSON)) {
 		std::cout << Payload.str() << std::endl;
-		//std::cout << oss.str() << std::endl;
 	}
 	Payload.flags(old_settings);
 
