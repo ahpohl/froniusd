@@ -254,10 +254,8 @@ bool Solarmeter::Publish(void)
 
 	std::ostringstream st_evt;
     st_evt << "{"
-        << "\"op_state\":\"" << StateEvt.St << "\"" << ","
-        << "\"op_state_str\":\"" << StateEvt.StStr << "\"" << ","
-		<< "\"op_code\":\"" << StateCode.St << "\"" << ","
-		<< "\"op_code_str\":\"" << StateCode.StStr << "\"" << "}";
+        << "\"inverter_state\":\"" << StateEvt.StStr << "\"" << ","
+		<< "\"state_code\":\"" << (StateCode.StStr.empty() ? "ok" : StateCode.StStr) << "\"" << "}";
 
 	if (Mqtt->GetNotifyOnlineFlag()) {
 		std::cout << "Solarmeter is online." << std::endl;
