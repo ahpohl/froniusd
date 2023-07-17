@@ -55,7 +55,7 @@ bool Solarmeter::Setup(const std::string &config)
 		ErrorMessage = Cfg->GetErrorMessage();
 		return false;
 	}
-	if (!Inverter->ConnectModbusRtu(Cfg->GetValue("serial_device"))) {
+	if (!Inverter->ConnectModbusRtu(Cfg->GetValue("serial_device"), 19200)) {
 		ErrorMessage = Inverter->GetErrorMessage();
 		return false;
 	}
@@ -67,6 +67,18 @@ bool Solarmeter::Setup(const std::string &config)
 		return false;
 	}
 	std::cout << "SunSpec protocol v1.0" << std::endl;
+
+	int timeout = 600;
+	if (!Inverter->SetResponseTimeout(timeout)) {
+		std::cout << Inverter->GetErrorMessage() << std::endl;
+		return false;
+	}
+	if (!Inverter->SetByteTimeout(timeout)) {
+		std::cout << Inverter->GetErrorMessage() << std::endl;
+		return false;
+	}
+	std::cout << "Setting Modbus timeout to " << std::to_string(timeout) << " ms." << std::endl;
+
 	if (!Inverter->GetSiteEnergyTotal(InvData.AcEnergy)) {
 		ErrorMessage = Inverter->GetErrorMessage();
 		return false;
@@ -133,6 +145,7 @@ bool Solarmeter::Receive(void)
 		ErrorMessage = Inverter->GetErrorMessage();
 		return false;
 	}
+	/*
 	if (!Inverter->GetAcCurrent(InvData.AcCurrent)) {
 		ErrorMessage = Inverter->GetErrorMessage();
 		return false;
@@ -141,6 +154,7 @@ bool Solarmeter::Receive(void)
 		ErrorMessage = Inverter->GetErrorMessage();
 		return false;
 	}
+	*/
 	if (!Inverter->GetAcPower(InvData.AcPowerW)) {
 		ErrorMessage = Inverter->GetErrorMessage();
 		return false;
@@ -157,42 +171,52 @@ bool Solarmeter::Receive(void)
 		ErrorMessage = Inverter->GetErrorMessage();
 		return false;
 	}
+	/*
 	if (!Inverter->GetAcFrequency(InvData.AcFreq)) {
 		ErrorMessage = Inverter->GetErrorMessage();
 		return false;
 	}
+	*/
 	if (!Inverter->GetDcVoltage(InvData.DcVoltage1, 1)) {
 		ErrorMessage = Inverter->GetErrorMessage();
 		return false;
 	}
+	/*
 	if (!Inverter->GetDcCurrent(InvData.DcCurrent1, 1)) {
 		ErrorMessage = Inverter->GetErrorMessage();
 		return false;
 	}
+	*/
 	if (!Inverter->GetDcPower(InvData.DcPower1, 1)) {
 		ErrorMessage = Inverter->GetErrorMessage();
 		return false;
 	}
+	/*
 	if (!Inverter->GetDcEnergyLifetime(InvData.DcEnergy1, 1)) {
 		ErrorMessage = Inverter->GetErrorMessage();
 		return false;
 	}
+	*/
 	if (!Inverter->GetDcVoltage(InvData.DcVoltage2, 2)) {
 		ErrorMessage = Inverter->GetErrorMessage();
 		return false;
 	}
+	/*
 	if (!Inverter->GetDcCurrent(InvData.DcCurrent2, 2)) {
 		ErrorMessage = Inverter->GetErrorMessage();
 		return false;
 	}
+	*/
 	if (!Inverter->GetDcPower(InvData.DcPower2, 2)) {
 		ErrorMessage = Inverter->GetErrorMessage();
 		return false;
 	}
+	/*
 	if (!Inverter->GetDcEnergyLifetime(InvData.DcEnergy2, 2)) {
 		ErrorMessage = Inverter->GetErrorMessage();
 		return false;
 	}
+	*/
 	try {
 		float denominator = InvData.DcPower1 + InvData.DcPower2;
 		if (denominator == 0) {
