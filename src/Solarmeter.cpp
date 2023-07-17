@@ -126,20 +126,19 @@ bool Solarmeter::Setup(const std::string &config)
 
 bool Solarmeter::Receive(void)
 {
-	FroniusInverter::StateEvt_t state_evt;
-	if (!Inverter->GetStateEvtFlags(state_evt)) {
+	if (!Inverter->GetStateEvtFlags(StateEvt)) {
 		ErrorMessage = Inverter->GetErrorMessage();
 	    return false;
 	}
-	FroniusInverter::StateCode_t state_code;
-	if (!Inverter->GetStateCode(state_code)) {
+	if (!Inverter->GetStateCode(StateCode)) {
 	    ErrorMessage = Inverter->GetErrorMessage();
 	    return false;
 	}
-	if (state_evt.St != 4) {
-		ErrorMessage = state_evt.StStr + " (" + std::to_string(state_evt.St) + ")";
-		if (!(state_code.StStr.empty())) {
-		    ErrorMessage.append(" -> " + state_code.StStr + " (" + std::to_string(state_code.St) + ")");
+
+	if (StateEvt.St != 4) {
+		ErrorMessage = StateEvt.StStr + " (" + std::to_string(StateEvt.St) + ")";
+		if (!(StateCode.StStr.empty())) {
+		    ErrorMessage.append(" -> " + StateCode.StStr + " (" + std::to_string(StateCode.St) + ")");
 		}
 		return false;
 	}
@@ -253,14 +252,12 @@ bool Solarmeter::Publish(void)
 			<< "\"payment\":"      << Cfg->GetValue("payment_kwh")
 			<< "}";
 
-
-	std::ostringstream oss;
-    oss << "{"
-        << "\"operating_state\":\"" << State.GlobalState << "\"" << ","
-        << "\"inverter_state\":\"" << State.InverterState << "\"" << ","
-        << "\"ch1_state\":\"" << State.Channel1State << "\"" << ","
-        << "\"ch2_state\":\"" << State.Channel2State << "\"" << ","
-        << "\"alarm_state\":\"" << State.AlarmState << "\"" << "}";
+	std::ostringstream st_evt;
+    st_evt << "{"
+        << "\"op_state\":\"" << StateEvt.St << "\"" << ","
+        << "\"op_state_str\":\"" << StateEvt.StStr << "\"" << ","
+		<< "\"op_code\":\"" << StateCode.St << "\"" << ","
+		<< "\"op_code_str\":\"" << StateCode.StStr << "\"" << "}";
 
 	if (Mqtt->GetNotifyOnlineFlag()) {
 		std::cout << "Solarmeter is online." << std::endl;
@@ -270,21 +267,18 @@ bool Solarmeter::Publish(void)
 		}
 	}
 
-	/*
-    static ABBAurora::State previous_state;
+    static FroniusInverter::StateEvt_t previous_state_evt = {0};
+    static FroniusInverter::StateCode_t previous_state_code = {0};
     if ( Mqtt->GetNotifyOnlineFlag() ||
-         (!((previous_state.GlobalState == State.GlobalState) &&
-         (previous_state.InverterState == State.InverterState) &&
-         (previous_state.Channel1State == State.Channel1State) &&
-         (previous_state.Channel2State == State.Channel2State) &&
-         (previous_state.AlarmState == State.AlarmState))) )
+         (!((previous_state_evt.St == StateEvt.St) && (previous_state_code.St == StateCode.St))) )
     {
-    if (!(Mqtt->PublishMessage(oss.str(), Cfg->GetValue("mqtt_topic") + "/state", 0, false))) {
-        ErrorMessage = Mqtt->GetErrorMessage();
-        return false;
+		if (!(Mqtt->PublishMessage(st_evt.str(), Cfg->GetValue("mqtt_topic") + "/state", 0, false))) {
+			ErrorMessage = Mqtt->GetErrorMessage();
+			return false;
+		}
+		previous_state_evt = StateEvt;
+		previous_state_code = StateCode;
     }
-    previous_state = State;
-	*/
 
 	if (Mqtt->GetConnectStatus())
 	{
@@ -298,6 +292,7 @@ bool Solarmeter::Publish(void)
 
 	if (Log & static_cast<unsigned char>(LogLevel::JSON)) {
 		std::cout << Payload.str() << std::endl;
+		std::cout << st_evt.str() << std::endl;
 	}
 	Payload.flags(old_settings);
 
