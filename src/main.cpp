@@ -1,10 +1,12 @@
 #include <iostream>
+#include <fstream>
 #include <iomanip>
 #include <memory>
 #include <getopt.h>
 #include <csignal>
 #include <thread>
 #include <chrono>
+#include <vector>
 #include <Solarmeter.h>
 
 volatile sig_atomic_t shutdown = false;
@@ -85,23 +87,41 @@ int main(int argc, char* argv[])
 		return EXIT_FAILURE;
 	}
 
-	static int timeout = 0;
+    std::ofstream output_file("histogram.txt", std::ios::app);
+	const int size = 40;
+	std::vector<int> histogram(size);
+	const int interval = 100;
+	int index = 0;
+	int counter = 1;
+    int timeout = 400;
+    const int step = 10;
+    std::cout << "Setting Modbus timeout to " << timeout << " ms." << std::endl;
 
 	while (shutdown == false)
 	{
 		if (!meter->Receive()) {
-			if (timeout < 5) {
-				std::cout << meter->GetErrorMessage() << std::endl;
-				++timeout;
-			}
-			continue;
-		} else {
-			timeout = 0;
-		}
-		if (!meter->Publish()) {
 			std::cout << meter->GetErrorMessage() << std::endl;
+		    histogram[index] += 1;
 		}
+		if ((counter % interval) == 0) {
+			output_file << timeout << ": " << histogram[index] << std::endl;
+			++index;
+			timeout += step;
+			meter->SetTimeout(timeout);
+			std::cout << "Setting Modbus timeout to " << timeout << " ms." << std::endl;
+		}
+		if (counter == (size * interval))
+			break;
+		++counter;
 	}
+
+	timeout = 400;
+	for (auto & bin : histogram) {
+	    std::cout << timeout << ": " << bin << std::endl;
+	    timeout += step;
+	}
+
+	output_file.close();
 
 	return EXIT_SUCCESS;
 }
