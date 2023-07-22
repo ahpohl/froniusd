@@ -70,7 +70,7 @@ bool Solarmeter::Setup(const std::string &config)
 	}
 	std::cout << "SunSpec protocol v1.0" << std::endl;
 
-	int timeout = 600;
+	int timeout = 690;
 	if (!Inverter->SetResponseTimeout(timeout)) {
 		std::cout << Inverter->GetErrorMessage() << std::endl;
 		return false;
