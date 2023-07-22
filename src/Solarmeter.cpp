@@ -64,19 +64,22 @@ bool Solarmeter::Setup(const std::string &config)
 	if (Log & static_cast<unsigned char>(LogLevel::MODBUS)) {
 		Inverter->SetModbusDebug(false);
 	}
-
-	const int timeout = 600;
-	if (!SetTimeout(timeout)) {
-		ErrorMessage = Inverter->GetErrorMessage();
-		return false;
-	}
-	std::cout << "Setting Modbus timeout to " << timeout << " ms." << std::endl;
-
 	if (!Inverter->IsSunSpecInverter()) {
 		ErrorMessage = Inverter->GetErrorMessage();
 		return false;
 	}
 	std::cout << "SunSpec protocol v1.0" << std::endl;
+
+	int timeout = 600;
+	if (!Inverter->SetResponseTimeout(timeout)) {
+		std::cout << Inverter->GetErrorMessage() << std::endl;
+		return false;
+	}
+	if (!Inverter->SetByteTimeout(timeout)) {
+		std::cout << Inverter->GetErrorMessage() << std::endl;
+		return false;
+	}
+	std::cout << "Setting Modbus timeout to " << std::to_string(timeout) << " ms." << std::endl;
 
 	if (!Inverter->GetSiteEnergyTotal(InvData.AcEnergy)) {
 		ErrorMessage = Inverter->GetErrorMessage();
@@ -341,17 +344,4 @@ T Solarmeter::StringTo(const std::string &str) const
 		return T();
 	}
 	return value;
-}
-
-bool Solarmeter::SetTimeout(const int &millis)
-{
-	if (!Inverter->SetResponseTimeout(millis)) {
-		std::cout << Inverter->GetErrorMessage() << std::endl;
-		return false;
-	}
-	if (!Inverter->SetByteTimeout(millis)) {
-		std::cout << Inverter->GetErrorMessage() << std::endl;
-		return false;
-	}
-	return true;
 }

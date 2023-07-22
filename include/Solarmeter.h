@@ -17,7 +17,6 @@ public:
 	bool Publish(void);
 	std::string GetErrorMessage(void) const;
 	unsigned char GetLogLevel(void) const;
-	bool SetTimeout(const int &millis);
 
 private:
 	FroniusInverter *Inverter;
