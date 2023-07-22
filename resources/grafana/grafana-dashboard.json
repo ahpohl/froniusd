@@ -3,11 +3,15 @@
     "list": [
       {
         "builtIn": 1,
-        "datasource": "-- Grafana --",
+        "datasource": {
+          "type": "fetzerch-sunandmoon-datasource",
+          "uid": "PubsQkIVz"
+        },
         "enable": true,
         "hide": true,
-        "iconColor": "rgba(0, 211, 255, 1)",
-        "name": "Annotations & Alerts",
+        "iconColor": "orange",
+        "name": "Sunrise / Sunset",
+        "query": "sunrise,sunset",
         "target": {
           "limit": 100,
           "matchAny": false,
@@ -23,14 +27,14 @@
   "fiscalYearStartMonth": 0,
   "gnetId": 12519,
   "graphTooltip": 0,
-  "id": 16,
+  "id": 29,
   "links": [],
   "liveNow": false,
   "panels": [
     {
       "datasource": {
         "type": "postgres",
-        "uid": "Qc9bUpgnz"
+        "uid": "fb079a8d-52aa-401c-a257-6a0a2f702184"
       },
       "fieldConfig": {
         "defaults": {
@@ -85,14 +89,19 @@
         "text": {},
         "textMode": "auto"
       },
-      "pluginVersion": "8.3.1",
+      "pluginVersion": "9.5.1",
       "targets": [
         {
+          "datasource": {
+            "type": "postgres",
+            "uid": "fb079a8d-52aa-401c-a257-6a0a2f702184"
+          },
+          "editorMode": "code",
           "format": "time_series",
           "group": [],
           "metricColumn": "none",
           "rawQuery": true,
-          "rawSql": "SELECT\n  time,\n  total_energy\nFROM live\nWHERE\n  $__timeFilter(time)\nORDER BY time DESC LIMIT 1;",
+          "rawSql": "SELECT\n  time,\n  energy_sum AS energy\nFROM\n  yearly_view\nORDER BY\n  time DESC LIMIT 1",
           "refId": "A",
           "select": [
             [
@@ -104,6 +113,23 @@
               }
             ]
           ],
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          },
           "table": "live",
           "timeColumn": "\"time\"",
           "timeColumnType": "timestamp",
@@ -117,22 +143,20 @@
         }
       ],
       "timeFrom": "5s",
-      "title": "Total Energy",
+      "title": "Energy $year",
       "transparent": true,
       "type": "stat"
     },
     {
       "datasource": {
         "type": "postgres",
-        "uid": "Qc9bUpgnz"
+        "uid": "fb079a8d-52aa-401c-a257-6a0a2f702184"
       },
-      "description": "",
       "fieldConfig": {
         "defaults": {
           "color": {
             "mode": "thresholds"
           },
-          "decimals": 1,
           "mappings": [
             {
               "options": {
@@ -153,7 +177,7 @@
               }
             ]
           },
-          "unit": "kwatth"
+          "unit": "percent"
         },
         "overrides": []
       },
@@ -164,8 +188,10 @@
         "y": 0
       },
       "hideTimeOverride": true,
-      "id": 24,
+      "id": 25,
+      "interval": "10s",
       "links": [],
+      "maxDataPoints": 100,
       "options": {
         "colorMode": "value",
         "graphMode": "none",
@@ -173,7 +199,7 @@
         "orientation": "horizontal",
         "reduceOptions": {
           "calcs": [
-            "sum"
+            "mean"
           ],
           "fields": "",
           "values": false
@@ -181,14 +207,19 @@
         "text": {},
         "textMode": "auto"
       },
-      "pluginVersion": "8.3.1",
+      "pluginVersion": "9.5.1",
       "targets": [
         {
+          "datasource": {
+            "type": "postgres",
+            "uid": "fb079a8d-52aa-401c-a257-6a0a2f702184"
+          },
+          "editorMode": "code",
           "format": "time_series",
           "group": [],
           "metricColumn": "none",
           "rawQuery": true,
-          "rawSql": "SELECT\n  date_trunc('day', NOW()) as time,\n  last(total_energy, time) - first(total_energy, time) as energy_today\nFROM live\nWHERE\n  time > date_trunc('day', NOW())",
+          "rawSql": "SELECT\n  now() as time,\n  energy_percent\nFROM get_solar_trend()",
           "refId": "A",
           "select": [
             [
@@ -200,6 +231,23 @@
               }
             ]
           ],
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          },
           "table": "cagg_hourly",
           "timeColumn": "bucket",
           "timeColumnType": "timestamp",
@@ -212,15 +260,15 @@
           ]
         }
       ],
-      "timeFrom": "24h",
-      "title": "Energy Today",
+      "timeFrom": "32d",
+      "title": "Energy $year Trend",
       "transparent": true,
       "type": "stat"
     },
     {
       "datasource": {
         "type": "postgres",
-        "uid": "Qc9bUpgnz"
+        "uid": "fb079a8d-52aa-401c-a257-6a0a2f702184"
       },
       "fieldConfig": {
         "defaults": {
@@ -283,14 +331,19 @@
         "showThresholdMarkers": true,
         "text": {}
       },
-      "pluginVersion": "8.3.1",
+      "pluginVersion": "9.5.1",
       "targets": [
         {
+          "datasource": {
+            "type": "postgres",
+            "uid": "fb079a8d-52aa-401c-a257-6a0a2f702184"
+          },
+          "editorMode": "code",
           "format": "time_series",
           "group": [],
           "metricColumn": "none",
           "rawQuery": true,
-          "rawSql": "SELECT                                                   \n  time,\n  grid_power\nFROM live\nWHERE\n  $__timeFilter(time)\nORDER BY time DESC LIMIT 1;",
+          "rawSql": "SELECT                                                   \n  time,\n  ac_power_w\nFROM live\nWHERE\n  $__timeFilter(time)\nORDER BY time DESC LIMIT 1;",
           "refId": "A",
           "select": [
             [
@@ -302,6 +355,23 @@
               }
             ]
           ],
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          },
           "table": "live",
           "timeColumn": "\"time\"",
           "timeColumnType": "timestamp",
@@ -314,15 +384,15 @@
           ]
         }
       ],
-      "timeFrom": "5s",
-      "title": "Grid Power",
+      "timeFrom": "10s",
+      "title": "AC Feed-in Power",
       "transparent": true,
       "type": "gauge"
     },
     {
       "datasource": {
         "type": "postgres",
-        "uid": "Qc9bUpgnz"
+        "uid": "fb079a8d-52aa-401c-a257-6a0a2f702184"
       },
       "description": "",
       "fieldConfig": {
@@ -331,6 +401,8 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
             "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
@@ -431,7 +503,7 @@
         ]
       },
       "gridPos": {
-        "h": 11,
+        "h": 10,
         "w": 12,
         "x": 12,
         "y": 0
@@ -447,15 +519,22 @@
             "min"
           ],
           "displayMode": "table",
-          "placement": "bottom"
+          "placement": "bottom",
+          "showLegend": true
         },
         "tooltip": {
-          "mode": "multi"
+          "mode": "multi",
+          "sort": "none"
         }
       },
       "pluginVersion": "7.4.5",
       "targets": [
         {
+          "datasource": {
+            "type": "postgres",
+            "uid": "fb079a8d-52aa-401c-a257-6a0a2f702184"
+          },
+          "editorMode": "code",
           "format": "time_series",
           "group": [],
           "metricColumn": "none",
@@ -472,6 +551,23 @@
               }
             ]
           ],
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          },
           "table": "live",
           "timeColumn": "\"time\"",
           "timeColumnType": "timestamp",
@@ -484,6 +580,10 @@
           ]
         },
         {
+          "datasource": {
+            "type": "postgres",
+            "uid": "fb079a8d-52aa-401c-a257-6a0a2f702184"
+          },
           "format": "time_series",
           "group": [],
           "hide": false,
@@ -521,7 +621,7 @@
     {
       "datasource": {
         "type": "postgres",
-        "uid": "Qc9bUpgnz"
+        "uid": "fb079a8d-52aa-401c-a257-6a0a2f702184"
       },
       "fieldConfig": {
         "defaults": {
@@ -569,14 +669,19 @@
         "text": {},
         "textMode": "auto"
       },
-      "pluginVersion": "8.3.1",
+      "pluginVersion": "9.5.1",
       "targets": [
         {
+          "datasource": {
+            "type": "postgres",
+            "uid": "fb079a8d-52aa-401c-a257-6a0a2f702184"
+          },
+          "editorMode": "code",
           "format": "time_series",
           "group": [],
           "metricColumn": "none",
           "rawQuery": true,
-          "rawSql": "SELECT\n  NOW() AS time,\n  avg(credit)\nFROM monthly_view",
+          "rawSql": "SELECT\n  time,\n  credit\nFROM\n  yearly_view\nORDER BY\n  time DESC LIMIT 1",
           "refId": "A",
           "select": [
             [
@@ -588,6 +693,23 @@
               }
             ]
           ],
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          },
           "table": "cagg_hourly",
           "timeColumn": "bucket",
           "timeColumnType": "timestamp",
@@ -601,21 +723,22 @@
         }
       ],
       "timeFrom": "370d",
-      "title": "Average Credit",
+      "title": "Credit $year",
       "transparent": true,
       "type": "stat"
     },
     {
       "datasource": {
         "type": "postgres",
-        "uid": "Qc9bUpgnz"
+        "uid": "fb079a8d-52aa-401c-a257-6a0a2f702184"
       },
+      "description": "",
       "fieldConfig": {
         "defaults": {
           "color": {
             "mode": "thresholds"
           },
-          "decimals": 2,
+          "decimals": 1,
           "mappings": [
             {
               "options": {
@@ -636,7 +759,7 @@
               }
             ]
           },
-          "unit": "currencyEUR"
+          "unit": "kwatth"
         },
         "overrides": []
       },
@@ -647,10 +770,8 @@
         "y": 3
       },
       "hideTimeOverride": true,
-      "id": 25,
-      "interval": "10s",
+      "id": 24,
       "links": [],
-      "maxDataPoints": 100,
       "options": {
         "colorMode": "value",
         "graphMode": "none",
@@ -658,7 +779,7 @@
         "orientation": "horizontal",
         "reduceOptions": {
           "calcs": [
-            "mean"
+            "sum"
           ],
           "fields": "",
           "values": false
@@ -666,14 +787,19 @@
         "text": {},
         "textMode": "auto"
       },
-      "pluginVersion": "8.3.1",
+      "pluginVersion": "9.5.1",
       "targets": [
         {
+          "datasource": {
+            "type": "postgres",
+            "uid": "fb079a8d-52aa-401c-a257-6a0a2f702184"
+          },
+          "editorMode": "code",
           "format": "time_series",
           "group": [],
           "metricColumn": "none",
           "rawQuery": true,
-          "rawSql": "SELECT\n  date_trunc('month', NOW()) AS time,\n  sum(credit) AS credit\nFROM daily_view\nWHERE\n  time > date_trunc('month', NOW())",
+          "rawSql": "SELECT\n  current_date as time,\n  last(ac_energy, time) - first(ac_energy, time) as energy_today\nFROM live\nWHERE\n  time > current_date",
           "refId": "A",
           "select": [
             [
@@ -685,6 +811,23 @@
               }
             ]
           ],
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          },
           "table": "cagg_hourly",
           "timeColumn": "bucket",
           "timeColumnType": "timestamp",
@@ -697,15 +840,15 @@
           ]
         }
       ],
-      "timeFrom": "32d",
-      "title": "Current Credit",
+      "timeFrom": "24h",
+      "title": "Energy Today",
       "transparent": true,
       "type": "stat"
     },
     {
       "datasource": {
         "type": "postgres",
-        "uid": "Qc9bUpgnz"
+        "uid": "fb079a8d-52aa-401c-a257-6a0a2f702184"
       },
       "fieldConfig": {
         "defaults": {
@@ -713,6 +856,8 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
             "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
@@ -771,20 +916,27 @@
         "legend": {
           "calcs": [],
           "displayMode": "list",
-          "placement": "bottom"
+          "placement": "bottom",
+          "showLegend": true
         },
         "tooltip": {
-          "mode": "multi"
+          "mode": "multi",
+          "sort": "none"
         }
       },
       "pluginVersion": "7.4.5",
       "targets": [
         {
+          "datasource": {
+            "type": "postgres",
+            "uid": "fb079a8d-52aa-401c-a257-6a0a2f702184"
+          },
+          "editorMode": "code",
           "format": "time_series",
           "group": [],
           "metricColumn": "none",
           "rawQuery": true,
-          "rawSql": "SELECT\n  time,\n  AVG(power_p1) OVER(ORDER BY time ROWS BETWEEN 4 PRECEDING AND CURRENT ROW) AS Pin1,\n  AVG(power_p2) OVER(ORDER BY time ROWS BETWEEN 4 PRECEDING AND CURRENT ROW) AS Pin2\nFROM live\nWHERE\n  $__timeFilter(time)\nORDER BY 1",
+          "rawSql": "SELECT\n  time,\n  AVG(dc_power_1) OVER(ORDER BY time ROWS BETWEEN 4 PRECEDING AND CURRENT ROW) AS String1,\n  AVG(dc_power_2) OVER(ORDER BY time ROWS BETWEEN 4 PRECEDING AND CURRENT ROW) AS String2\nFROM live\nWHERE\n  $__timeFilter(time)\nORDER BY 1",
           "refId": "A",
           "select": [
             [
@@ -796,6 +948,23 @@
               }
             ]
           ],
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          },
           "table": "live",
           "timeColumn": "\"time\"",
           "timeColumnType": "timestamp",
@@ -816,7 +985,7 @@
     {
       "datasource": {
         "type": "postgres",
-        "uid": "Qc9bUpgnz"
+        "uid": "fb079a8d-52aa-401c-a257-6a0a2f702184"
       },
       "description": "",
       "fieldConfig": {
@@ -825,6 +994,8 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
             "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
@@ -928,7 +1099,7 @@
         "h": 11,
         "w": 12,
         "x": 12,
-        "y": 11
+        "y": 10
       },
       "hideTimeOverride": false,
       "id": 27,
@@ -941,20 +1112,27 @@
             "min"
           ],
           "displayMode": "table",
-          "placement": "bottom"
+          "placement": "bottom",
+          "showLegend": true
         },
         "tooltip": {
-          "mode": "multi"
+          "mode": "multi",
+          "sort": "none"
         }
       },
       "pluginVersion": "7.4.5",
       "targets": [
         {
+          "datasource": {
+            "type": "postgres",
+            "uid": "fb079a8d-52aa-401c-a257-6a0a2f702184"
+          },
+          "editorMode": "code",
           "format": "time_series",
           "group": [],
           "metricColumn": "none",
           "rawQuery": true,
-          "rawSql": "SELECT\n  time,\n  energy\nFROM monthly_view\nWHERE\n  $__timeFilter(time)\nORDER BY 1;",
+          "rawSql": "SELECT\n  time,\n  energy_sum\nFROM monthly_view\nWHERE\n  $__timeFilter(time)\nORDER BY 1;",
           "refId": "A",
           "select": [
             [
@@ -966,6 +1144,23 @@
               }
             ]
           ],
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          },
           "table": "live",
           "timeColumn": "\"time\"",
           "timeColumnType": "timestamp",
@@ -978,6 +1173,10 @@
           ]
         },
         {
+          "datasource": {
+            "type": "postgres",
+            "uid": "fb079a8d-52aa-401c-a257-6a0a2f702184"
+          },
           "format": "time_series",
           "group": [],
           "hide": false,
@@ -1014,8 +1213,8 @@
     },
     {
       "datasource": {
-        "type": "datasource",
-        "uid": "-- Mixed --"
+        "type": "postgres",
+        "uid": "fb079a8d-52aa-401c-a257-6a0a2f702184"
       },
       "fieldConfig": {
         "defaults": {
@@ -1023,6 +1222,8 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
             "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
@@ -1107,7 +1308,7 @@
         ]
       },
       "gridPos": {
-        "h": 8,
+        "h": 7,
         "w": 12,
         "x": 0,
         "y": 14
@@ -1118,11 +1319,13 @@
         "graph": {},
         "legend": {
           "calcs": [],
-          "displayMode": "hidden",
-          "placement": "bottom"
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
         },
         "tooltip": {
-          "mode": "single"
+          "mode": "single",
+          "sort": "none"
         }
       },
       "pluginVersion": "7.4.5",
@@ -1130,13 +1333,14 @@
         {
           "datasource": {
             "type": "postgres",
-            "uid": "Qc9bUpgnz"
+            "uid": "fb079a8d-52aa-401c-a257-6a0a2f702184"
           },
+          "editorMode": "code",
           "format": "time_series",
           "group": [],
           "metricColumn": "none",
           "rawQuery": true,
-          "rawSql": "SELECT\n  bucket_5m AS time,\n  power_5m AS power\nFROM cagg_power\nWHERE\n  $__timeFilter(bucket_5m)\nORDER BY 1",
+          "rawSql": "SELECT\n  bucket_5m AS time,\n  ac_pwr AS power\nFROM cagg_power\nWHERE\n  $__timeFilter(bucket_5m)\nORDER BY 1",
           "refId": "A",
           "select": [
             [
@@ -1148,6 +1352,23 @@
               }
             ]
           ],
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          },
           "table": "cagg_hourly_view",
           "timeColumn": "bucket",
           "timeColumnType": "timestamptz",
@@ -1158,15 +1379,6 @@
               "type": "macro"
             }
           ]
-        },
-        {
-          "datasource": {
-            "type": "fetzerch-sunandmoon-datasource",
-            "uid": "CtNZ6oR7z"
-          },
-          "hide": true,
-          "refId": "B",
-          "target": "sun_altitude"
         }
       ],
       "title": "Average Power",
@@ -1174,12 +1386,37 @@
       "type": "timeseries"
     }
   ],
-  "refresh": "5s",
-  "schemaVersion": 34,
+  "refresh": "10s",
+  "revision": 1,
+  "schemaVersion": 38,
   "style": "dark",
   "tags": [],
   "templating": {
-    "list": []
+    "list": [
+      {
+        "current": {
+          "selected": false,
+          "text": "2023",
+          "value": "2023"
+        },
+        "datasource": {
+          "type": "postgres",
+          "uid": "fb079a8d-52aa-401c-a257-6a0a2f702184"
+        },
+        "definition": "SELECT extract(year FROM time) AS year FROM yearly_view ORDER BY time DESC LIMIT 1;",
+        "hide": 2,
+        "includeAll": false,
+        "multi": false,
+        "name": "year",
+        "options": [],
+        "query": "SELECT extract(year FROM time) AS year FROM yearly_view ORDER BY time DESC LIMIT 1;",
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 0,
+        "type": "query"
+      }
+    ]
   },
   "time": {
     "from": "now-12h",
@@ -1202,6 +1439,6 @@
   "timezone": "",
   "title": "Solarmeter",
   "uid": "Zy76S8QGk",
-  "version": 32,
+  "version": 24,
   "weekStart": ""
 }
