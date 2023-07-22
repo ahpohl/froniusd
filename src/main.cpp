@@ -57,7 +57,7 @@ int main(int argc, char* argv[])
 	} while (opt != -1);
 
 	if (help) {
-		std::cout << "Solarmeter " << VERSION_TAG << std::endl;
+		std::cout << "Froniusd " << VERSION_TAG << std::endl;
 		std::cout << std::endl << "Usage: " << argv[0] << " [-vv] -c [file]" << std::endl;
 		std::cout << "\n\
   -h --help         Show help message\n\
@@ -75,7 +75,7 @@ int main(int argc, char* argv[])
 		return EXIT_SUCCESS;
 	}
 
-	std::cout << "Solarmeter " << VERSION_TAG
+	std::cout << "Froniusd " << VERSION_TAG
 			<< " (" << VERSION_BUILD << ")" << std::endl;
 
 	std::unique_ptr<Solarmeter> meter(new Solarmeter());
