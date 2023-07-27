@@ -32,7 +32,7 @@ CPPFLAGS += -DVERSION_BUILD_DATE=\""$(shell date "+%F %T")"\" \
             -DVERSION_BUILD=\"$(BUILD_INFO)\"
 
 # define any directories containing header files other than /usr/include
-INCLUDES = -I./include
+INCLUDES = -I./include -I/usr/include/libsunspec
 
 ifeq ($(CROSS_COMPILE),aarch64-unknown-linux-gnu)
 INCLUDES += -I../libsunspec/include
@@ -46,7 +46,11 @@ LFLAGS += -L../libsunspec/build
 endif
 
 # define any libraries to link into executable:
+LIBS = -lsunspec -lmodbus -lmosquitto
+
+ifeq ($(CROSS_COMPILE),aarch64-unknown-linux-gnu)
 LIBS = -Wl,-Bstatic -lsunspec -Wl,-Bdynamic -lmodbus -lmosquitto 
+endif
 
 # define src and obj directories
 SRC_DIR = src
