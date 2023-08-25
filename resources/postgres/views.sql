@@ -11,7 +11,6 @@ SELECT
   energy_1d * payment AS credit,
   total,
   payment,
-  power_avg,
   power_max
 FROM archive JOIN plan ON archive.plan_id = plan.id
 GROUP BY bucket_1d, energy_1d, total, payment, power_avg, power_max
@@ -22,7 +21,6 @@ SELECT
   energy_1d * payment AS credit,
   total,
   payment,
-  power_avg,
   power_max
 FROM cagg_daily JOIN plan ON cagg_daily.plan_id = plan.id
 -- insert end time of archive
@@ -49,7 +47,6 @@ SELECT
   min(energy) AS energy_min,
   avg(energy) AS energy_avg,
   max(energy) AS energy_max,
-  avg(power_avg) AS power_avg,
   max(power_max) AS power_max
 FROM daily_view
 GROUP BY time_bucket('1 month', time)
@@ -75,7 +72,6 @@ SELECT
   min(energy) AS energy_min,
   avg(energy) AS energy_avg,
   max(energy) AS energy_max,
-  avg(power_avg) AS power_avg,
   max(power_max) AS power_max
 FROM daily_view
 GROUP BY time_bucket('1 year', time)

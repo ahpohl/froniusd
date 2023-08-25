@@ -14,7 +14,6 @@ SELECT
   plan_id,
   last(ac_energy, time) - first(ac_energy, time) AS energy_1d,
   first(ac_energy, time) AS total,
-  avg(ac_power_w) AS power_avg,
   max(ac_power_w) AS power_max
 FROM live
 GROUP BY bucket_1d, plan_id, sensor_id
