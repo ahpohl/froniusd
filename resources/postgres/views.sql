@@ -13,7 +13,7 @@ SELECT
   payment,
   power_max
 FROM archive JOIN plan ON archive.plan_id = plan.id
-GROUP BY bucket_1d, energy_1d, total, payment, power_avg, power_max
+GROUP BY bucket_1d, energy_1d, total, payment, power_max
 UNION
 SELECT
   bucket_1d AS time,
@@ -25,7 +25,7 @@ SELECT
 FROM cagg_daily JOIN plan ON cagg_daily.plan_id = plan.id
 -- insert end time of archive
 WHERE bucket_1d > TIMESTAMP WITH TIME ZONE '2023-06-30 00:00:00+02'
-GROUP BY bucket_1d, energy_1d, total, payment, power_avg, power_max
+GROUP BY bucket_1d, energy_1d, total, payment, power_max
 ORDER BY time;
 
 -- index
