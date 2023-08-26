@@ -7,7 +7,7 @@
           "type": "fetzerch-sunandmoon-datasource",
           "uid": "PubsQkIVz"
         },
-        "enable": true,
+        "enable": false,
         "hide": true,
         "iconColor": "orange",
         "name": "Sunrise / Sunset",
@@ -24,7 +24,7 @@
       }
     ]
   },
-  "description": "Show data from a smart energy meter",
+  "description": "Show data from Fronius inverter",
   "editable": true,
   "fiscalYearStartMonth": 0,
   "gnetId": 12519,
@@ -145,7 +145,7 @@
         }
       ],
       "timeFrom": "5s",
-      "title": "Energy $year",
+      "title": "Energy Total $year",
       "transparent": true,
       "type": "stat"
     },
@@ -345,7 +345,7 @@
           "group": [],
           "metricColumn": "none",
           "rawQuery": true,
-          "rawSql": "SELECT                                                   \n  time,\n  ac_power_w\nFROM live\nWHERE\n  $__timeFilter(time)\nORDER BY time DESC LIMIT 1;",
+          "rawSql": "SELECT                                                   \n  time,\n  ac_power_w\nFROM live\nORDER BY time DESC LIMIT 1;",
           "refId": "A",
           "select": [
             [
@@ -505,12 +505,12 @@
         ]
       },
       "gridPos": {
-        "h": 10,
+        "h": 11,
         "w": 12,
         "x": 12,
         "y": 0
       },
-      "hideTimeOverride": false,
+      "hideTimeOverride": true,
       "id": 23,
       "options": {
         "graph": {},
@@ -522,7 +522,7 @@
           ],
           "displayMode": "table",
           "placement": "bottom",
-          "showLegend": true
+          "showLegend": false
         },
         "tooltip": {
           "mode": "multi",
@@ -541,7 +541,7 @@
           "group": [],
           "metricColumn": "none",
           "rawQuery": true,
-          "rawSql": "SELECT\n  time,\n  energy\nFROM daily_view\nWHERE\n  $__timeFilter(time)\nORDER BY 1;",
+          "rawSql": "SELECT\n  time,\n  energy\nFROM daily_view\nWHERE\n  $__timeFilter(time) \nORDER BY 1;",
           "refId": "A",
           "select": [
             [
@@ -586,12 +586,13 @@
             "type": "postgres",
             "uid": "fb079a8d-52aa-401c-a257-6a0a2f702184"
           },
+          "editorMode": "code",
           "format": "time_series",
           "group": [],
           "hide": false,
           "metricColumn": "none",
           "rawQuery": true,
-          "rawSql": "SELECT\n  time,\n  credit\nFROM daily_view\nWHERE\n  $__timeFilter(time)\nORDER BY 1;",
+          "rawSql": "SELECT\n  time,\n  credit\nFROM daily_view\nWHERE\n  time > date_trunc('month', NOW())\nORDER BY 1;",
           "refId": "B",
           "select": [
             [
@@ -603,6 +604,23 @@
               }
             ]
           ],
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          },
           "table": "live",
           "timeColumn": "\"time\"",
           "timeColumnType": "timestamp",
@@ -615,8 +633,9 @@
           ]
         }
       ],
-      "timeFrom": "12d",
-      "title": "Daily Energy",
+      "timeFrom": "now/M",
+      "timeShift": "0M/M",
+      "title": "Energy $month",
       "transparent": true,
       "type": "timeseries"
     },
@@ -906,11 +925,12 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 8,
+        "h": 7,
         "w": 12,
         "x": 0,
         "y": 6
       },
+      "hideTimeOverride": true,
       "id": 6,
       "interval": "5s",
       "options": {
@@ -919,7 +939,7 @@
           "calcs": [],
           "displayMode": "list",
           "placement": "bottom",
-          "showLegend": true
+          "showLegend": false
         },
         "tooltip": {
           "mode": "multi",
@@ -938,7 +958,7 @@
           "group": [],
           "metricColumn": "none",
           "rawQuery": true,
-          "rawSql": "SELECT\n  time,\n  AVG(dc_power_1) OVER(ORDER BY time ROWS BETWEEN 4 PRECEDING AND CURRENT ROW) AS String1,\n  AVG(dc_power_2) OVER(ORDER BY time ROWS BETWEEN 4 PRECEDING AND CURRENT ROW) AS String2\nFROM live\nWHERE\n  $__timeFilter(time)\nORDER BY 1",
+          "rawSql": "SELECT\n  time,\n  dc_power_1 as string1,\n  dc_power_2 as string2\nFROM live\nWHERE\n  $__timeFilter(time) \nORDER BY 1",
           "refId": "A",
           "select": [
             [
@@ -1101,9 +1121,9 @@
         "h": 11,
         "w": 12,
         "x": 12,
-        "y": 10
+        "y": 11
       },
-      "hideTimeOverride": false,
+      "hideTimeOverride": true,
       "id": 27,
       "options": {
         "graph": {},
@@ -1115,7 +1135,7 @@
           ],
           "displayMode": "table",
           "placement": "bottom",
-          "showLegend": true
+          "showLegend": false
         },
         "tooltip": {
           "mode": "multi",
@@ -1134,7 +1154,7 @@
           "group": [],
           "metricColumn": "none",
           "rawQuery": true,
-          "rawSql": "SELECT\n  time,\n  energy_sum\nFROM monthly_view\nWHERE\n  $__timeFilter(time)\nORDER BY 1;",
+          "rawSql": "SELECT\n  time,\n  energy_sum as energy\nFROM monthly_view\nWHERE\n  $__timeFilter(time)\nORDER BY 1;",
           "refId": "A",
           "select": [
             [
@@ -1208,8 +1228,9 @@
           ]
         }
       ],
-      "timeFrom": "366d",
-      "title": "Monthly Energy",
+      "timeFrom": "now/y",
+      "timeShift": "0y/y",
+      "title": "Energy $year",
       "transparent": true,
       "type": "timeseries"
     },
@@ -1274,10 +1295,10 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 7,
+        "h": 9,
         "w": 12,
         "x": 0,
-        "y": 14
+        "y": 13
       },
       "hideTimeOverride": false,
       "id": 2,
@@ -1306,7 +1327,7 @@
           "group": [],
           "metricColumn": "none",
           "rawQuery": true,
-          "rawSql": "SELECT\n  bucket_5m AS time,\n  pwr_w AS power\nFROM cagg_power\nWHERE\n  $__timeFilter(bucket_5m)\nORDER BY 1",
+          "rawSql": "SELECT\n  bucket_5m AS time,\n  ac_pwr_w AS power\nFROM cagg_power\nWHERE\n  $__timeFilter(bucket_5m)\nORDER BY 1",
           "refId": "A",
           "select": [
             [
@@ -1347,7 +1368,7 @@
           ]
         }
       ],
-      "title": "Total Power",
+      "title": "Power Day",
       "transparent": true,
       "type": "timeseries"
     }
@@ -1381,12 +1402,35 @@
         "skipUrlSync": false,
         "sort": 0,
         "type": "query"
+      },
+      {
+        "current": {
+          "selected": false,
+          "text": "August   ",
+          "value": "August   "
+        },
+        "datasource": {
+          "type": "postgres",
+          "uid": "fb079a8d-52aa-401c-a257-6a0a2f702184"
+        },
+        "definition": "SELECT TO_CHAR(now(), 'Month') AS month FROM monthly_view;",
+        "hide": 2,
+        "includeAll": false,
+        "multi": false,
+        "name": "month",
+        "options": [],
+        "query": "SELECT TO_CHAR(now(), 'Month') AS month FROM monthly_view;",
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 0,
+        "type": "query"
       }
     ]
   },
   "time": {
-    "from": "now-12h",
-    "to": "now"
+    "from": "now/d",
+    "to": "now/d"
   },
   "timepicker": {
     "refresh_intervals": [
@@ -1405,6 +1449,6 @@
   "timezone": "",
   "title": "Solarmeter",
   "uid": "Zy76S8QGk",
-  "version": 32,
+  "version": 64,
   "weekStart": ""
 }

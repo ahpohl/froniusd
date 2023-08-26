@@ -22,7 +22,7 @@ SELECT
   payment
 FROM cagg_daily JOIN plan ON cagg_daily.plan_id = plan.id
 -- insert end time of archive
-WHERE bucket_1d > TIMESTAMP WITH TIME ZONE '2023-06-30 00:00:00+02'
+WHERE bucket_1d > TIMESTAMP WITH TIME ZONE '2023-08-25 00:00:00+02'
 GROUP BY bucket_1d, energy_1d, total, payment
 ORDER BY time;
 
@@ -38,7 +38,7 @@ GRANT SELECT ON TABLE daily_view TO grafana;
 CREATE MATERIALIZED VIEW monthly_view
 AS
 SELECT
-  time_bucket('1 month', time) AS time,
+  time_bucket('1 month', time, 'Europe/Berlin') AS time,
   sum(energy) AS energy_sum,
   sum(credit) AS credit,
   first(total, time) AS total,
@@ -46,7 +46,7 @@ SELECT
   avg(energy) AS energy_avg,
   max(energy) AS energy_max
 FROM daily_view
-GROUP BY time_bucket('1 month', time)
+GROUP BY time_bucket('1 month', time, 'Europe/Berlin')
 ORDER BY time;
 
 -- index
@@ -61,7 +61,7 @@ GRANT SELECT ON TABLE monthly_view TO grafana;
 CREATE MATERIALIZED VIEW yearly_view
 AS
 SELECT
-  time_bucket('1 year', time) AS time,
+  time_bucket('1 year', time, 'Europe/Berlin') AS time,
   count(*) as days,
   sum(energy) AS energy_sum,
   sum(credit) AS credit,
@@ -70,7 +70,7 @@ SELECT
   avg(energy) AS energy_avg,
   max(energy) AS energy_max
 FROM daily_view
-GROUP BY time_bucket('1 year', time)
+GROUP BY time_bucket('1 year', time, 'Europe/Berlin')
 ORDER BY time;
 
 -- index
