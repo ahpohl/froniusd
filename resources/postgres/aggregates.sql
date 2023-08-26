@@ -13,15 +13,15 @@ SELECT
   sensor_id,
   plan_id,
   last(ac_energy, time) - first(ac_energy, time) AS energy_1d,
-  first(ac_energy, time) AS total,
+  first(ac_energy, time) AS total
 FROM live
 GROUP BY bucket_1d, plan_id, sensor_id
 WITH NO DATA;
 
 -- refresh policy
 SELECT add_continuous_aggregate_policy('cagg_daily',
-  start_offset => INTERVAL '3 days',
-  end_offset => INTERVAL '1 hour',
+  start_offset => INTERVAL '30 days',
+  end_offset => INTERVAL '1 day',
   schedule_interval => '1 day');
 
 --
@@ -46,8 +46,8 @@ WITH NO DATA;
 
 -- refresh policy
 SELECT add_continuous_aggregate_policy('cagg_power',
-  start_offset => INTERVAL '3 hours',
-  end_offset => INTERVAL '1 minute',
+  start_offset => INTERVAL '1 day',
+  end_offset => INTERVAL '5 minutes',
   schedule_interval => '5 minutes');
 
 -- grant

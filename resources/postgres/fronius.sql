@@ -65,7 +65,7 @@ CREATE TABLE "live" (
 );
 
 SELECT create_hypertable('live', 'time');
-SELECT add_retention_policy('live', INTERVAL '30 days');
+SELECT add_retention_policy('live', INTERVAL '90 days');
 
 GRANT INSERT, SELECT ON TABLE live TO nodejs;
 GRANT SELECT ON TABLE live TO grafana;
