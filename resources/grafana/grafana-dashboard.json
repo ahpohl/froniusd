@@ -145,7 +145,7 @@
         }
       ],
       "timeFrom": "5s",
-      "title": "Energy Total $year",
+      "title": "Energy $year",
       "transparent": true,
       "type": "stat"
     },
@@ -345,7 +345,7 @@
           "group": [],
           "metricColumn": "none",
           "rawQuery": true,
-          "rawSql": "SELECT                                                   \n  time,\n  ac_power_w\nFROM live\nORDER BY time DESC LIMIT 1;",
+          "rawSql": "SELECT                                                   \n  time,\n  ac_power_w\nFROM live\nWHERE $__timeFilter(time) \nORDER BY time DESC LIMIT 1;",
           "refId": "A",
           "select": [
             [
@@ -635,7 +635,7 @@
       ],
       "timeFrom": "now/M",
       "timeShift": "0M/M",
-      "title": "Energy $month",
+      "title": "Energy Month",
       "transparent": true,
       "type": "timeseries"
     },
@@ -958,7 +958,7 @@
           "group": [],
           "metricColumn": "none",
           "rawQuery": true,
-          "rawSql": "SELECT\n  time,\n  dc_power_1 as string1,\n  dc_power_2 as string2\nFROM live\nWHERE\n  $__timeFilter(time) \nORDER BY 1",
+          "rawSql": "SELECT\n  time,\n  AVG(dc_power_1) OVER(ORDER BY time ROWS BETWEEN 4 PRECEDING AND CURRENT ROW) AS string1,\n  AVG(dc_power_2) OVER(ORDER BY time ROWS BETWEEN 4 PRECEDING AND CURRENT ROW) AS string2\nFROM live\nWHERE\n  time BETWEEN now() - INTERVAL '15 min' AND now()\nORDER BY 1",
           "refId": "A",
           "select": [
             [
@@ -1230,7 +1230,7 @@
       ],
       "timeFrom": "now/y",
       "timeShift": "0y/y",
-      "title": "Energy $year",
+      "title": "Energy Year",
       "transparent": true,
       "type": "timeseries"
     },
@@ -1449,6 +1449,6 @@
   "timezone": "",
   "title": "Solarmeter",
   "uid": "Zy76S8QGk",
-  "version": 64,
+  "version": 70,
   "weekStart": ""
 }
