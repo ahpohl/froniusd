@@ -19,7 +19,8 @@ CREATE TABLE "sensors" (
   model VARCHAR(50),
   serial VARCHAR(50),
   firmware VARCHAR(50),
-  power_max INTEGER
+  power_w INTEGER,
+  power_va INTEGER
 );
 
 CREATE TABLE "plan" (

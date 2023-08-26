@@ -15,7 +15,9 @@
         "target": {
           "limit": 100,
           "matchAny": false,
-          "tags": [],
+          "tags": [
+            "sun"
+          ],
           "type": "dashboard"
         },
         "type": "dashboard"
@@ -286,7 +288,7 @@
               "type": "special"
             }
           ],
-          "max": 4500,
+          "max": 4000,
           "min": 0,
           "thresholds": {
             "mode": "absolute",
@@ -297,11 +299,11 @@
               },
               {
                 "color": "#EAB839",
-                "value": 500
+                "value": 250
               },
               {
                 "color": "green",
-                "value": 2000
+                "value": 1500
               }
             ]
           },
@@ -978,7 +980,7 @@
         }
       ],
       "timeFrom": "15m",
-      "title": "Power",
+      "title": "DC Power Tracker",
       "transparent": true,
       "type": "timeseries"
     },
@@ -1219,7 +1221,8 @@
       "fieldConfig": {
         "defaults": {
           "color": {
-            "mode": "palette-classic"
+            "fixedColor": "purple",
+            "mode": "fixed"
           },
           "custom": {
             "axisCenteredZero": false,
@@ -1255,6 +1258,7 @@
               "mode": "off"
             }
           },
+          "links": [],
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
@@ -1267,45 +1271,7 @@
           },
           "unit": "watt"
         },
-        "overrides": [
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "power"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "purple",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Sun altitude"
-            },
-            "properties": [
-              {
-                "id": "custom.lineStyle",
-                "value": {
-                  "dash": [
-                    10,
-                    10
-                  ],
-                  "fill": "dash"
-                }
-              },
-              {
-                "id": "custom.axisPlacement",
-                "value": "auto"
-              }
-            ]
-          }
-        ]
+        "overrides": []
       },
       "gridPos": {
         "h": 7,
@@ -1340,7 +1306,7 @@
           "group": [],
           "metricColumn": "none",
           "rawQuery": true,
-          "rawSql": "SELECT\n  bucket_5m AS time,\n  ac_pwr AS power\nFROM cagg_power\nWHERE\n  $__timeFilter(bucket_5m)\nORDER BY 1",
+          "rawSql": "SELECT\n  bucket_5m AS time,\n  pwr_w AS power\nFROM cagg_power\nWHERE\n  $__timeFilter(bucket_5m)\nORDER BY 1",
           "refId": "A",
           "select": [
             [
@@ -1381,7 +1347,7 @@
           ]
         }
       ],
-      "title": "Average Power",
+      "title": "Total Power",
       "transparent": true,
       "type": "timeseries"
     }
@@ -1439,6 +1405,6 @@
   "timezone": "",
   "title": "Solarmeter",
   "uid": "Zy76S8QGk",
-  "version": 24,
+  "version": 32,
   "weekStart": ""
 }
