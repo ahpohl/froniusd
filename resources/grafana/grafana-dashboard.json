@@ -7,18 +7,20 @@
           "type": "fetzerch-sunandmoon-datasource",
           "uid": "PubsQkIVz"
         },
-        "enable": false,
+        "enable": true,
+        "filter": {
+          "exclude": false,
+          "ids": [
+            2
+          ]
+        },
         "hide": true,
         "iconColor": "orange",
+        "mappings": {},
         "name": "Sunrise / Sunset",
-        "query": "sunrise,sunset",
         "target": {
-          "limit": 100,
-          "matchAny": false,
-          "tags": [
-            "sun"
-          ],
-          "type": "dashboard"
+          "query": "sunrise,sunset",
+          "refId": "annotation_query"
         },
         "type": "dashboard"
       }
@@ -91,7 +93,7 @@
         "text": {},
         "textMode": "auto"
       },
-      "pluginVersion": "9.5.1",
+      "pluginVersion": "10.0.3",
       "targets": [
         {
           "datasource": {
@@ -209,7 +211,7 @@
         "text": {},
         "textMode": "auto"
       },
-      "pluginVersion": "9.5.1",
+      "pluginVersion": "10.0.3",
       "targets": [
         {
           "datasource": {
@@ -333,7 +335,7 @@
         "showThresholdMarkers": true,
         "text": {}
       },
-      "pluginVersion": "9.5.1",
+      "pluginVersion": "10.0.3",
       "targets": [
         {
           "datasource": {
@@ -690,7 +692,7 @@
         "text": {},
         "textMode": "auto"
       },
-      "pluginVersion": "9.5.1",
+      "pluginVersion": "10.0.3",
       "targets": [
         {
           "datasource": {
@@ -808,7 +810,7 @@
         "text": {},
         "textMode": "auto"
       },
-      "pluginVersion": "9.5.1",
+      "pluginVersion": "10.0.3",
       "targets": [
         {
           "datasource": {
@@ -958,7 +960,7 @@
           "group": [],
           "metricColumn": "none",
           "rawQuery": true,
-          "rawSql": "SELECT\n  time,\n  AVG(dc_power_1) OVER(ORDER BY time ROWS BETWEEN 4 PRECEDING AND CURRENT ROW) AS string1,\n  AVG(dc_power_2) OVER(ORDER BY time ROWS BETWEEN 4 PRECEDING AND CURRENT ROW) AS string2\nFROM live\nWHERE\n  time BETWEEN now() - INTERVAL '15 min' AND now()\nORDER BY 1",
+          "rawSql": "SELECT\n  time,\n  AVG(dc_power_1) OVER(ORDER BY time ROWS BETWEEN 4 PRECEDING AND CURRENT ROW) AS string1,\n  AVG(dc_power_2) OVER(ORDER BY time ROWS BETWEEN 4 PRECEDING AND CURRENT ROW) AS string2\nFROM live\nWHERE\n  $__timeFilter(time) \nORDER BY 1",
           "refId": "A",
           "select": [
             [
@@ -1269,7 +1271,7 @@
             "scaleDistribution": {
               "type": "linear"
             },
-            "showPoints": "auto",
+            "showPoints": "never",
             "spanNulls": true,
             "stacking": {
               "group": "A",
@@ -1429,8 +1431,8 @@
     ]
   },
   "time": {
-    "from": "now/d",
-    "to": "now/d"
+    "from": "now/d+4h",
+    "to": "now/d-1h"
   },
   "timepicker": {
     "refresh_intervals": [
@@ -1449,6 +1451,6 @@
   "timezone": "",
   "title": "Solarmeter",
   "uid": "Zy76S8QGk",
-  "version": 70,
+  "version": 77,
   "weekStart": ""
 }
