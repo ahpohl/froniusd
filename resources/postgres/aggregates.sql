@@ -50,5 +50,8 @@ SELECT add_continuous_aggregate_policy('cagg_power',
   end_offset => INTERVAL '5 minutes',
   schedule_interval => '5 minutes');
 
+-- retention policy
+SELECT add_retention_policy('cagg_power', INTERVAL '1 year');
+
 -- grant
 GRANT SELECT ON TABLE cagg_power TO grafana;
