@@ -1,6 +1,6 @@
 # Froniusd
 
-The froniud daemon is built upon the [libsunspec](https://ahpohl.github.io/libsunspec/) library to communicate with the Fronius inverter. The daemon reads the energy production from the inverter, outputs a JSON formatted string and sends it to a MQTT broker on the network. From there, the data is forwarded into a time series database for permanent data storage and for visualization. The complete software stack consists of the following components, which need to be installed and configured separately:
+The froniud daemon is built upon the [libsunspec](https://github.com/ahpohl/libsunspec) library to communicate with the Fronius inverter. The daemon reads the energy production from the inverter, outputs a JSON formatted string and sends it to a MQTT broker on the network. From there, the data is forwarded into a time series database for permanent data storage and for visualization. The complete software stack consists of the following components, which need to be installed and configured separately:
 - Froniusd with RS485 dongle for data readout
 - Mosquitto MQTT broker
 - Node-RED (MQTT client, PostgreSQL and optional email alerts)
