@@ -1,6 +1,15 @@
---- a/CMakeLists.txt	2023-07-21 13:51:07.288962289 +0200
-+++ b/CMakeLists.txt	2023-07-21 13:49:16.703916456 +0200
-@@ -25,13 +25,13 @@
+--- a/CMakeLists.txt	2024-02-25 18:30:27.771555224 +0100
++++ b/CMakeLists.txt	2024-02-25 18:35:24.787560624 +0100
+@@ -7,6 +7,8 @@
+ cmake_minimum_required(VERSION 3.1)
+ cmake_policy(SET CMP0042 NEW)
+ 
++set(CMAKE_TOOLCHAIN_FILE toolchain.cmake)
++
+ project(mosquitto)
+ set (VERSION 2.0.18)
+ 
+@@ -25,13 +27,13 @@
  
  include(GNUInstallDirs)
  
@@ -18,7 +27,7 @@
  if (WITH_TLS)
  	find_package(OpenSSL REQUIRED)
  	add_definitions("-DWITH_TLS")
-@@ -48,20 +48,20 @@
+@@ -48,20 +50,20 @@
  endif (WITH_TLS)
  
  
@@ -43,7 +52,7 @@
  
  option(WITH_THREADING "Include client library threading support?" ON)
  if (WITH_THREADING)
-@@ -96,7 +96,7 @@
+@@ -96,7 +98,7 @@
  	add_definitions("-DWITH_DLT")
  endif (WITH_DLT)
  
@@ -52,7 +61,7 @@
  if (WITH_CJSON)
      FIND_PACKAGE(cJSON)
      if (CJSON_FOUND)
-@@ -110,11 +110,11 @@
+@@ -110,11 +112,11 @@
  # Include projects
  # ========================================
  
