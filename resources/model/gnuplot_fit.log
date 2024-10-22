@@ -1,0 +1,63 @@
+# fit f(x) "solar-model.dat" via a,b,c,d,e
+# final sum of squares of residuals : 2.66835
+a               = 2.27126369198144e-08  
+b               = -1.51933584272486e-05 
+c               = 0.00240109109238097   
+d               = 0.0498571649056778    
+e               = 0.603508132388513     
+
+
+*******************************************************************************
+Fri Feb 16 07:50:24 2024
+
+
+FIT:    data read from "solar-model.dat"
+        format = z
+        #datapoints = 365
+        residuals are weighted equally (unit weight)
+
+function used for fitting: f(x)
+fitted parameters initialized with current variable values
+
+
+
+*******************************************************************************
+Fri Feb 16 07:50:31 2024
+
+
+FIT:    data read from "solar-model.dat"
+        format = z
+        #datapoints = 365
+        residuals are weighted equally (unit weight)
+
+function used for fitting: f(x)
+	f(x) = a*x**4 + b*x**3 + c*x**2 + d*x + e
+fitted parameters initialized with current variable values
+
+iter      chisq       delta/lim  lambda   a             b             c             d             e            
+   0 1.3014035827e+22   0.00e+00  2.66e+09    1.000000e+00   1.000000e+00   1.000000e+00   1.000000e+00   1.000000e+00
+  12 2.5632426096e+03  -1.97e-04  2.66e-03    2.271264e-08  -1.519336e-05   2.401091e-03   4.985716e-02   6.035082e-01
+
+After 12 iterations the fit converged.
+final sum of squares of residuals : 2563.24
+rel. change during last iteration : -1.97206e-09
+
+degrees of freedom    (FIT_NDF)                        : 360
+rms of residuals      (FIT_STDFIT) = sqrt(WSSR/ndf)    : 2.66835
+variance of residuals (reduced chisquare) = WSSR/ndf   : 7.12012
+
+Final set of parameters            Asymptotic Standard Error
+=======================            ==========================
+a               = 2.27126e-08      +/- 1.653e-09    (7.277%)
+b               = -1.51934e-05     +/- 1.219e-06    (8.025%)
+c               = 0.00240109       +/- 0.0002972    (12.38%)
+d               = 0.0498572        +/- 0.0268       (53.76%)
+e               = 0.603508         +/- 0.71         (117.6%)
+
+correlation matrix of the fit parameters:
+                a      b      c      d      e      
+a               1.000 
+b              -0.992  1.000 
+c               0.959 -0.986  1.000 
+d              -0.867  0.917 -0.969  1.000 
+e               0.607 -0.668  0.751 -0.870  1.000 
