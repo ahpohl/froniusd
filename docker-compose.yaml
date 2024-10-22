@@ -1,0 +1,6 @@
+services:
+  froniusd:
+    image: froniusd
+    build:
+      context: .
+      dockerfile: Dockerfile
