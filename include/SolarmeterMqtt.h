@@ -2,6 +2,7 @@
 #define SolarmeterMqtt_h
 
 #include <mosquitto.h>
+#include <string>
 
 class SolarmeterMqtt {
   static void OnConnectCallbackWrapper(struct mosquitto *mosq, void *obj,

@@ -1,4 +1,5 @@
 #include "SolarmeterMqtt.h"
+#include <string>
 #include <chrono>
 #include <iostream>
 #include <mosquitto.h>
