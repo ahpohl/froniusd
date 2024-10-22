@@ -32,7 +32,7 @@ payment_kwh 0.3914
 The daemon can be started with:
 
 ```
-$ froniusd --config froniusd_example.conf
+froniusd --config froniusd_example.conf
 
 ```
 
@@ -47,7 +47,11 @@ Example JSON string published by Froniusd in the `solarmeter/live` topic:
 
 ## Docker
 
-There is a docker-compose provided, which lets you build and run froniusd completely inside a docker container.
+There is a docker-compose for Froniusd and optionally for the Mosquitto broker provided, which lets you run Froniusd inside docker.
+
+```
+docker-compose up --build
+```
 
 ## Visualization
 
