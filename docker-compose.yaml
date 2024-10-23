@@ -3,4 +3,5 @@ services:
     image: froniusd
     build:
       context: .
-      dockerfile: Dockerfile
+    volumes:
+      - ${PWD}/resources/config/froniusd_example.conf:/etc/froniusd.conf 

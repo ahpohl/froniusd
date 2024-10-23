@@ -17,4 +17,4 @@ ADD https://api.github.com/repos/ahpohl/froniusd/git/refs/heads/master froniusd-
 COPY . /app/froniusd
 RUN cd /app/froniusd && make install
 
-ENTRYPOINT ["froniusd"]
+ENTRYPOINT froniusd --config /etc/froniusd.conf

@@ -40,8 +40,27 @@ froniusd --config froniusd_example.conf
 
 Example JSON string published by Froniusd in the `solarmeter/live` topic:
 
-```json
-{"time":1729597414501,"ac_energy":6813.517,"ac_current":3.330,"ac_voltage":234.400,"ac_power_w":781.000,"ac_power_va":781.016,"ac_power_var":-7.000,"ac_pf":99.996,"ac_freq":50.010,"ac_eff":94.565,"dc_voltage_1":292.900,"dc_current_1":1.360,"dc_power_1":399.300,"dc_energy_1":3349.270,"dc_voltage_2":294.200,"dc_current_2":1.440,"dc_power_2":426.590,"dc_energy_2":3398.550,"payment":0.3914}
+```
+{ "time":1729597414501,    # timestamp, sec since epoch
+  "ac_energy":6813.517,    # AC total energy counter, kWh
+  "ac_current":3.330,      # AC current, A
+  "ac_voltage":234.400,    # AC voltage, V
+  "ac_power_w":781.000,    # AC active power, W
+  "ac_power_va":781.016,   # AC apparent power, VA
+  "ac_power_var":-7.000,   # AC reactive power, VAr
+  "ac_pf":99.996,          # AC power factor
+  "ac_freq":50.010,        # AC frequency, Hz
+  "ac_eff":94.565,         # AC conversion efficiency
+  "dc_voltage_1":292.900,  # DC voltage string 1, V
+  "dc_current_1":1.360,    # DC current string 1, A
+  "dc_power_1":399.300,    # DC power string 1, W
+  "dc_energy_1":3349.270,  # DC total energy string 1, kWh 
+  "dc_voltage_2":294.200,  # DC voltage string 2, V
+  "dc_current_2":1.440,    # DC current string 2, A
+  "dc_power_2":426.590,    # DC power string 2, W
+  "dc_energy_2":3398.550,  # DC total energy string 2, kWh 
+  "payment":0.3914         # payment per kWh, € (or whatever)
+ }
 
 ```
 
