@@ -14,7 +14,6 @@ RUN cd /app/libsunspec && sed -i 's/ln\s-sr\(.*\)/ln -s \1/g' Makefile && make P
 
 ADD https://api.github.com/repos/ahpohl/froniusd/git/refs/heads/master froniusd-version.json
 RUN git clone https://github.com/ahpohl/froniusd.git
-#COPY . /app/froniusd
 RUN cd /app/froniusd && make install
 
 ENTRYPOINT froniusd --config /etc/froniusd.conf

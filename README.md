@@ -24,7 +24,7 @@ The Modbus data export needs to be enabled in the web interface. Here you have t
 Froniusd is configured through a config file. Here you need to set the IP address of the inverter or the serial device, the broker and the topic, and the payment for each produced kWh at a minimum. A fully commented example is provided in the resources section. 
 
 ```
-modbus_tcp 192.168.6.53
+modbus_tcp primo.home.arpa
 # modbus_rtu /dev/ttyUSB0
 mqtt_topic solarmeter
 mqtt_broker localhost

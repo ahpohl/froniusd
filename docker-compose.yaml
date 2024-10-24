@@ -1,7 +1,16 @@
 services:
   froniusd:
     image: froniusd
+    container_name: froniusd
     build:
       context: .
+      dockerfile: Dockerfile
     volumes:
-      - ${PWD}/resources/config/froniusd_example.conf:/etc/froniusd.conf 
+      - ${PWD}/resources/config/froniusd_example.conf:/etc/froniusd.conf
+    
+    # uncomment devices for modbus rtu
+    # run container as unprivileged user and 
+    # group which has R/W access to the device
+    #devices:
+    #  - /dev/serial/by-id/usb-FTDI_FT232R_USB_UART_AC009Y6C-if00-port0
+    #user: 964:987
