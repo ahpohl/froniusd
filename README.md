@@ -6,12 +6,14 @@ The Froniud daemon connects to the inverter either with Modbus TCP (network) or 
 
 ## Build instructions
 
-Froniusd depends on [libsunspec](https://github.com/ahpohl/libsunspec), a library which provides the necessary low level methods to access the inverter. Packages for [froniusd](https://aur.archlinux.org/packages/froniusd) and [libsunspec](https://aur.archlinux.org/packages/libsunspec) are published in the AUR. If you need to compile Froniusd directly from source, a Makefile for (cross-)compilation is provided:
+Froniusd depends on [libsunspec](https://github.com/ahpohl/libsunspec), a library which provides the necessary low level methods to access the inverter and on [libmosquitto](https://mosquitto.org/) for connecting to the MQTT broker. Packages of [froniusd](https://aur.archlinux.org/packages/froniusd) and [libsunspec](https://aur.archlinux.org/packages/libsunspec) are published in the AUR. If you need to compile Froniusd directly from source, a Makefile for (cross-)compilation is provided.
 
 ```
 make CROSS_COMPILE=aarch64-unknown-linux-gnu
 make install
 ```
+
+Instructions how to setup a cross toolchain and how to compile and install libmosquitto into the toolchain can be found [here](resources/mosquitto/README.md).
 
 ## Configuration
 
