@@ -102,17 +102,19 @@ bool Solarmeter::Setup(const std::string &config) {
     Cfg->ShowConfig();
   }
 
-  int timeout = 690;
-  if (!Inverter->SetResponseTimeout(timeout)) {
-    std::cout << Inverter->GetErrorMessage() << std::endl;
-    return false;
+  if (Cfg->KeyExists("modbus_rtu")) {
+    int timeout = 690;
+    if (!Inverter->SetResponseTimeout(timeout)) {
+      std::cout << Inverter->GetErrorMessage() << std::endl;
+      return false;
+    }
+    if (!Inverter->SetByteTimeout(timeout)) {
+      std::cout << Inverter->GetErrorMessage() << std::endl;
+      return false;
+    }
+    std::cout << "Setting Modbus timeout to " << std::to_string(timeout)
+              << " ms." << std::endl;
   }
-  if (!Inverter->SetByteTimeout(timeout)) {
-    std::cout << Inverter->GetErrorMessage() << std::endl;
-    return false;
-  }
-  std::cout << "Setting Modbus timeout to " << std::to_string(timeout) << " ms."
-            << std::endl;
   if (!Inverter->SetModbusAddress(1)) {
     std::cout << Inverter->GetErrorMessage() << std::endl;
     return false;
