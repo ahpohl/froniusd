@@ -13,15 +13,38 @@ make CROSS_COMPILE=aarch64-unknown-linux-gnu
 make install
 ```
 
-Instructions how to setup a cross toolchain and how to compile and install libmosquitto into the toolchain can be found [here](resources/mosquitto/README.md).
+Instructions how to setup a cross toolchain and how to compile and install libmosquitto into the toolchain can be found [here](resources/mosquitto/README.md). 
+
+## Installation
+
+The Arch Linux package provides a systemd service file and installs the configuration file in `/etc/froniusd/froniusd.conf`. The service can be started with:
+
+```
+systemctl start froniusd
+```
+
+When building directly from source, the daemon can be directly started with:
+
+```
+froniusd --config resources/config/froniusd_example.conf
+
+```
+
+## Docker
+
+The Arch Linux package installs a docker compose in `/etc/froniusd/docker-compose.yaml` and a `Dockerfile`. Alternatively, these files are also in the root folder or the source. For Modbus RTU, the serial device needs to be set in `docker-compose.yaml` in addtion to `fronius.conf` to give Docker access to the USB device.
+
+```
+docker-compose up --build
+```
 
 ## Configuration
 
-The Modbus data export needs to be enabled in the web interface. Here you have to choose between tcp and rtu mode. In case of rtu, a serial RS485-to-USB converter is required to connect the inverter to the host running Froniusd.
+Before Froniusd is able to connect to the inverter, the Modbus data export needs to be enabled in the web interface. Here you have the choice between tcp and rtu mode. In case of rtu, a serial RS485-to-USB converter is required to connect the inverter to the host running Froniusd.
 
 ![Screenshot of the Fronius web interface modbus configuration section](resources/images/fronius_primo_modbus_tcp.png)
 
-Froniusd is configured through a config file. Here you need to set the IP address of the inverter or the serial device, the broker and the topic, and the payment for each produced kWh at a minimum. A fully commented example is provided in the resources section. 
+A minimal `froniusd.conf` config file looks like this:
 
 ```
 modbus_tcp primo.home.arpa
@@ -31,12 +54,7 @@ mqtt_broker localhost
 payment_kwh 0.3914
 ```
 
-The daemon can be started with:
-
-```
-froniusd --config froniusd_example.conf
-
-```
+Here `modbus_tcp` is the hostname or IPv4/IPv6 address of the inverter and `modbus_rtu` the serial device of the USB converter. You can only set either of these keywords, but not both. The rest of the keywords are the hostname of the MQTT broker, the topic to publish to, and the payment for each produced kWh. A fully commented example is provided in the resources section. 
 
 ## Json output
 
@@ -66,16 +84,8 @@ Example JSON string published by Froniusd in the `solarmeter/live` topic:
 
 ```
 
-## Docker
-
-There is a docker-compose for Froniusd provided, which lets you run Froniusd inside docker. For Modbus RTU, the serial device needs to be set in froniusd.conf and in the docker-compose.yaml. For Modbus TCP, the inverter host name/address is only taken from froniusd.conf.
-
-```
-docker-compose up --build
-```
-
 ## Visualization
 
-Grafana is used show the current and historic energy production on a dashborad, which is provided in the resource section. The energy trend calculation requires a model of the yearly energy production specific to the actual photovoltaic system. The model folder in the resource section contains a spreadsheet with raw data, a gnuplot fit and the final sql file with my current model.
+Grafana is used show the current and historic energy production on a dashborad. In my [setup](https://github.com/ahpohl/smartmeter/wiki), the output from Froniusd is first sent to the Mosquitto MQTT broker, from there forwarded and stored in a TimescaleDB database and then queried by Grafana. Note that the energy trend calculation requires a model of the yearly energy production specific to the actual photovoltaic system. The model folder in the resource section contains a spreadsheet with raw data, a gnuplot fit and the final sql file with my current model.
 
 ![Screenshot of the Grafana dashboard showing production data](resources/images/grafana_dashboard.png)
