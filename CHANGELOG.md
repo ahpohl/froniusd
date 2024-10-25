@@ -1,6 +1,7 @@
 # froniusd changelog
 
-## v0.1.2 - 2024-10-xx
+## v0.1.2 - 2024-10-25
+* minimum libsunspec 0.1.3
 * add support for Modbus TCP
 * docker support
 * llvm code-style format
