@@ -358,7 +358,7 @@ void Solarmeter::SetLogLevel(void) {
         Log |= static_cast<unsigned char>(LogLevel::CONFIG);
       } else if (!(*it).compare("json")) {
         Log |= static_cast<unsigned char>(LogLevel::JSON);
-      } else if (!(*it).compare("mosquitto")) {
+      } else if (!(*it).compare("mqtt")) {
         Log |= static_cast<unsigned char>(LogLevel::MQTT);
       } else if (!(*it).compare("modbus")) {
         Log |= static_cast<unsigned char>(LogLevel::MODBUS);
