@@ -68,7 +68,7 @@ Example JSON string published by Froniusd in the `solarmeter/live` topic:
 
 ## Docker
 
-There is a docker-compose for Froniusd and optionally for the Mosquitto broker provided, which lets you run Froniusd inside docker.
+There is a docker-compose for Froniusd provided, which lets you run Froniusd inside docker. For Modbus RTU, the serial device needs to be set in froniusd.conf and in the docker-compose.yaml. For Modbus TCP, the inverter host name/address is only taken from froniusd.conf.
 
 ```
 docker-compose up --build

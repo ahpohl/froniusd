@@ -47,6 +47,10 @@ bool Solarmeter::Setup(const std::string &config) {
     ErrorMessage = Cfg->GetErrorMessage();
     return false;
   }
+  this->SetLogLevel();
+  if (Log & static_cast<unsigned char>(LogLevel::CONFIG)) {
+    Cfg->ShowConfig();
+  }
   if (!(Cfg->KeyExists("modbus_rtu")) && !(Cfg->KeyExists("modbus_tcp"))) {
     ErrorMessage = "Use either Modbus TCP or Modbus RTU.";
     return false;
@@ -90,18 +94,9 @@ bool Solarmeter::Setup(const std::string &config) {
     ErrorMessage = Inverter->GetErrorMessage();
     return false;
   }
-
-  this->SetLogLevel();
   if (Log & static_cast<unsigned char>(LogLevel::MODBUS)) {
     Inverter->SetModbusDebug(true);
   }
-  if (Log & static_cast<unsigned char>(LogLevel::MQTT)) {
-    Mqtt->SetDebug(true);
-  }
-  if (Log & static_cast<unsigned char>(LogLevel::CONFIG)) {
-    Cfg->ShowConfig();
-  }
-
   if (Cfg->KeyExists("modbus_rtu")) {
     int timeout = 690;
     if (!Inverter->SetResponseTimeout(timeout)) {
@@ -134,6 +129,9 @@ bool Solarmeter::Setup(const std::string &config) {
   if (!Mqtt->Begin()) {
     ErrorMessage = Mqtt->GetErrorMessage();
     return false;
+  }
+  if (Log & static_cast<unsigned char>(LogLevel::MQTT)) {
+    Mqtt->SetDebug(true);
   }
   if ((Cfg->KeyExists("mqtt_user") && Cfg->KeyExists("mqtt_password"))) {
     if (!Mqtt->SetUserPassAuth(Cfg->GetValue("mqtt_user"),
