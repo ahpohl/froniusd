@@ -6,11 +6,12 @@ services:
       context: .
       dockerfile: Dockerfile
     volumes:
-      - ${PWD}/resources/config/froniusd_example.conf:/etc/froniusd.conf
+      - ${PWD}/froniusd.conf:/etc/froniusd.conf
     
     # uncomment devices for modbus rtu
     # run container as unprivileged user and 
     # group which has R/W access to the device
     #devices:
-    #  - /dev/serial/by-id/usb-FTDI_FT232R_USB_UART_AC009Y6C-if00-port0
+    #  - /dev/ttyUSB0
+    # solarmeter:uucp
     #user: 964:987
