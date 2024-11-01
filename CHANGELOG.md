@@ -1,5 +1,8 @@
 # froniusd changelog
 
+## v0.1.3 - 2024-11-xx
+* repeat reading and writing registers on timeout
+
 ## v0.1.2 - 2024-10-25
 * minimum libsunspec 0.1.3
 * add support for Modbus TCP
