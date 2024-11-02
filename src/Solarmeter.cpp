@@ -97,18 +97,9 @@ bool Solarmeter::Setup(const std::string &config) {
   if (Log & static_cast<unsigned char>(LogLevel::MODBUS)) {
     Inverter->SetModbusDebug(true);
   }
-  int timeout = 800;
-  if (!Inverter->SetResponseTimeout(timeout)) {
+  if (!Inverter->SetResponseTimeout(800)) {
     std::cout << Inverter->GetErrorMessage() << std::endl;
     return false;
-  }
-  if (Log & static_cast<unsigned char>(LogLevel::MODBUS)) {
-    if (!Inverter->GetResponseTimeout(timeout)) {
-      std::cout << Inverter->GetErrorMessage() << std::endl;
-      return false;
-    }
-    std::cout << "Response timeout: " << std::to_string(timeout) << " ms."
-              << std::endl;
   }
   if (!Inverter->SetModbusAddress(1)) {
     std::cout << Inverter->GetErrorMessage() << std::endl;
