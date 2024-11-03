@@ -101,6 +101,10 @@ bool Solarmeter::Setup(const std::string &config) {
     std::cout << Inverter->GetErrorMessage() << std::endl;
     return false;
   }
+  if (!Inverter->SetErrorRecovery(true)) {
+    std::cout << Inverter->GetErrorMessage() << std::endl;
+    return false;
+  }
   if (!Inverter->SetModbusAddress(1)) {
     std::cout << Inverter->GetErrorMessage() << std::endl;
     return false;
