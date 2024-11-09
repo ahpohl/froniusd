@@ -13,7 +13,7 @@
 const std::set<std::string> Solarmeter::ValidKeys{
     "log_level",   "mqtt_broker", "mqtt_password", "mqtt_port",   "mqtt_topic",
     "mqtt_user",   "mqtt_cafile", "mqtt_capath",   "payment_kwh", "modbus_rtu",
-    "modbus_baud", "modbus_tcp",  "modbus_port"};
+    "modbus_baud", "modbus_tcp",  "modbus_port",   "modbus_slave"};
 
 Solarmeter::Solarmeter(void) : Log(0) {
   Inverter = new FroniusInverter();
@@ -97,15 +97,21 @@ bool Solarmeter::Setup(const std::string &config) {
   if (Log & static_cast<unsigned char>(LogLevel::MODBUS)) {
     Inverter->SetModbusDebug(true);
   }
+  if (Cfg->KeyExists("modbus_rtu") && Cfg->KeyExists("modbus_slave")) {
+    if (!(Inverter->SetModbusAddress(
+            StringTo<int>(Cfg->GetValue("modbus_slave"))))) {
+      std::cout << Inverter->GetErrorMessage() << std::endl;
+      return false;
+    }
+  } else if (Cfg->KeyExists("modbus_rtu") && !(Inverter->SetModbusAddress(1))) {
+    std::cout << Inverter->GetErrorMessage() << std::endl;
+    return false;
+  }
   if (!Inverter->SetResponseTimeout(800)) {
     std::cout << Inverter->GetErrorMessage() << std::endl;
     return false;
   }
   if (!Inverter->SetErrorRecovery(true)) {
-    std::cout << Inverter->GetErrorMessage() << std::endl;
-    return false;
-  }
-  if (!Inverter->SetModbusAddress(1)) {
     std::cout << Inverter->GetErrorMessage() << std::endl;
     return false;
   }
