@@ -72,40 +72,50 @@ bool Solarmeter::Setup(const std::string &config) {
     return false;
   }
 
-  if (Cfg->KeyExists("modbus_rtu") && Cfg->KeyExists("modbus_baud") &&
-      !(Inverter->ConnectModbusRtu(
-          Cfg->GetValue("modbus_rtu"),
-          StringTo<int>(Cfg->GetValue("modbus_baud"))))) {
-    ErrorMessage = Inverter->GetErrorMessage();
-    return false;
-  } else if (Cfg->KeyExists("modbus_rtu") &&
-             !(Inverter->ConnectModbusRtu(Cfg->GetValue("modbus_rtu"),
-                                          19200))) {
-    ErrorMessage = Inverter->GetErrorMessage();
-    return false;
+  if (Cfg->KeyExists("modbus_rtu") && Cfg->KeyExists("modbus_baud")) {
+    if (!(Inverter->ConnectModbusRtu(
+            Cfg->GetValue("modbus_rtu"),
+            StringTo<int>(Cfg->GetValue("modbus_baud"))))) {
+      ErrorMessage = Inverter->GetErrorMessage();
+      return false;
+    }
+  } else if (Cfg->KeyExists("modbus_rtu")) {
+    if (!(Inverter->ConnectModbusRtu(Cfg->GetValue("modbus_rtu"), 19200))) {
+      ErrorMessage = Inverter->GetErrorMessage();
+      return false;
+    }
   }
-  if (Cfg->KeyExists("modbus_tcp") && Cfg->KeyExists("modbus_port") &&
-      !(Inverter->ConnectModbusTcp(Cfg->GetValue("modbus_tcp"),
-                                   Cfg->GetValue("modbus_port")))) {
-    ErrorMessage = Inverter->GetErrorMessage();
-    return false;
-  } else if (Cfg->KeyExists("modbus_tcp") &&
-             !(Inverter->ConnectModbusTcp(Cfg->GetValue("modbus_tcp")))) {
-    ErrorMessage = Inverter->GetErrorMessage();
-    return false;
+  if (Cfg->KeyExists("modbus_tcp") && Cfg->KeyExists("modbus_port")) {
+    if (!(Inverter->ConnectModbusTcp(Cfg->GetValue("modbus_tcp"),
+                                     Cfg->GetValue("modbus_port")))) {
+      ErrorMessage = Inverter->GetErrorMessage();
+      return false;
+    }
+  } else if (Cfg->KeyExists("modbus_tcp")) {
+    if (!(Inverter->ConnectModbusTcp(Cfg->GetValue("modbus_tcp")))) {
+      ErrorMessage = Inverter->GetErrorMessage();
+      return false;
+    }
   }
   if (Log & static_cast<unsigned char>(LogLevel::MODBUS)) {
     Inverter->SetModbusDebug(true);
   }
-  if (Cfg->KeyExists("modbus_rtu") && Cfg->KeyExists("modbus_slave")) {
+  if (Cfg->KeyExists("modbus_slave")) {
     if (!(Inverter->SetModbusAddress(
             StringTo<int>(Cfg->GetValue("modbus_slave"))))) {
-      std::cout << Inverter->GetErrorMessage() << std::endl;
+      ErrorMessage = Inverter->GetErrorMessage();
       return false;
     }
-  } else if (Cfg->KeyExists("modbus_rtu") && !(Inverter->SetModbusAddress(1))) {
-    std::cout << Inverter->GetErrorMessage() << std::endl;
-    return false;
+  } else {
+    if (!(Inverter->SetModbusAddress(1))) {
+      ErrorMessage = Inverter->GetErrorMessage();
+      return false;
+    }
+  }
+  if (Log & static_cast<unsigned char>(LogLevel::MODBUS)) {
+    int modbus_slave = 0;
+    Inverter->GetModbusAddress(modbus_slave);
+    std::cout << "Modbus address: " << modbus_slave << std::endl;
   }
   if (!Inverter->SetResponseTimeout(800)) {
     std::cout << Inverter->GetErrorMessage() << std::endl;
@@ -148,15 +158,17 @@ bool Solarmeter::Setup(const std::string &config) {
       return false;
     }
   }
-  if (Cfg->KeyExists("mqtt_broker") && Cfg->KeyExists("mqtt_port") &&
-      (!Mqtt->Connect(Cfg->GetValue("mqtt_broker"),
-                      StringTo<int>(Cfg->GetValue("mqtt_port")), 60))) {
-    ErrorMessage = Mqtt->GetErrorMessage();
-    return false;
-  } else if (Cfg->KeyExists("mqtt_broker") &&
-             (!Mqtt->Connect(Cfg->GetValue("mqtt_broker"), 1883, 60))) {
-    ErrorMessage = Mqtt->GetErrorMessage();
-    return false;
+  if (Cfg->KeyExists("mqtt_port")) {
+    if (!Mqtt->Connect(Cfg->GetValue("mqtt_broker"),
+                       StringTo<int>(Cfg->GetValue("mqtt_port")), 60)) {
+      ErrorMessage = Mqtt->GetErrorMessage();
+      return false;
+    }
+  } else {
+    if (!Mqtt->Connect(Cfg->GetValue("mqtt_broker"), 1883, 60)) {
+      ErrorMessage = Mqtt->GetErrorMessage();
+      return false;
+    }
   }
   if (!Mqtt->SetLastWillTestament(
           "offline", Cfg->GetValue("mqtt_topic") + "/status", 1, true)) {
