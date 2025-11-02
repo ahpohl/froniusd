@@ -1,3 +1,5 @@
+> **⚠️ This repository has been superseded by [fronius-bridge](https://github.com/ahpohl/fronius-bridge). Please use that project for future development and updates.**
+
 # Froniusd
 
 Although Fronius provides a nice web application in the cloud and a mobile application which shows graphs and a history of the produced energy, I still would like to fully own my data and be able to store the data without dependence on a third party service. Hence the motivation to utilize the Modbus data export function of my Fronius inverter to store the data locally in TimescaleDB and Grafana for visualisation.
